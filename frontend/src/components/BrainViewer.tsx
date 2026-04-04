@@ -112,20 +112,20 @@ function BrainMesh({ meshData, activations, onRegionClick, isLoading }: BrainMes
     const colorAttr = geometry.getAttribute("color") as THREE.BufferAttribute
     const colors = colorAttr.array as Float32Array
 
-    // Contrast-stretch per brain: use the 5th/95th percentile as min/max
-    // so outliers don't wash out the color range
+    // Contrast-stretch: 10th/90th percentile + gamma boost for vivid differences
     let min = 0, max = 1
     if (activations && activations.length > 0) {
       const sorted = [...activations].sort((a, b) => a - b)
-      const p5 = Math.floor(sorted.length * 0.05)
-      const p95 = Math.floor(sorted.length * 0.95)
-      min = sorted[p5]
-      max = sorted[p95]
+      const p10 = Math.floor(sorted.length * 0.10)
+      const p90 = Math.floor(sorted.length * 0.90)
+      min = sorted[p10]
+      max = sorted[p90]
     }
 
     for (let i = 0; i < meshData.vertices.length; i++) {
       const val = activations ? activations[i] : NaN
-      const { r, g, b } = activationToRGB(val, min, max)
+      // Gamma < 1 pushes mid-values toward the hot end, making differences pop
+      const { r, g, b } = activationToRGB(val, min, max, 0.6)
       colors[i * 3] = r
       colors[i * 3 + 1] = g
       colors[i * 3 + 2] = b
@@ -245,6 +245,7 @@ interface BrainViewerProps {
   label: string
   isLoading?: boolean
   onRegionClick?: (region: string) => void
+  resetKey?: string | number
 }
 
 export default function BrainViewer({
@@ -253,6 +254,7 @@ export default function BrainViewer({
   label,
   isLoading,
   onRegionClick,
+  resetKey,
 }: BrainViewerProps) {
   return (
     <div className="relative w-full brain-entrance" style={{ aspectRatio: "1" }}>
@@ -281,6 +283,7 @@ export default function BrainViewer({
         </div>
       ) : (
         <Canvas
+          key={resetKey}
           camera={{ position: [0, 0, 250], fov: 45 }}
           style={{ background: "transparent" }}
           aria-label={`Brain activation heatmap for ${label}`}

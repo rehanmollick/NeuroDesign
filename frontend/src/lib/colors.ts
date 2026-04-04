@@ -32,11 +32,14 @@ export function activationToRGB(
   value: number,
   min = 0,
   max = 1,
+  gamma = 1,
 ): { r: number; g: number; b: number } {
   if (value === null || value === undefined || isNaN(value)) return DEFAULT
-  // Contrast-stretch: map [min, max] -> [0, 1] so the full color range is used
+  // Contrast-stretch: map [min, max] -> [0, 1]
   const range = max - min
-  const v = range < 1e-6 ? 0.5 : Math.max(0, Math.min(1, (value - min) / range))
+  let v = range < 1e-6 ? 0.5 : Math.max(0, Math.min(1, (value - min) / range))
+  // Gamma: < 1 pushes values toward hot end, making regional differences pop
+  if (gamma !== 1) v = Math.pow(v, gamma)
   return mapColor(v)
 }
 

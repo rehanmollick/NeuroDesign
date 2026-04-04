@@ -252,49 +252,72 @@ export default function Home() {
       {/* Brain viewers */}
       <div
         id="results"
-        className="brain-grid grid gap-8 fade-up fade-up-4"
+        className="brain-grid fade-up fade-up-4"
         style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "24px",
           opacity: isScanning ? 0.4 : 1,
           transition: "opacity 200ms ease-out",
-          gridTemplateColumns: "1fr 1fr",
         }}
       >
         {/* Brain A */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {comparison?.imageA.url && (
             <img
               src={comparison.imageA.url}
               alt={comparison.imageA.name}
-              style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", borderRadius: "4px", border: "1px solid #1e1e2e" }}
+              style={{ width: "100%", aspectRatio: "16/7", objectFit: "cover", borderRadius: "4px", border: "1px solid #1e1e2e" }}
             />
           )}
-          <BrainViewer
-            meshData={meshData}
-            activations={comparison?.activations.imageA ?? null}
-            label={comparison?.imageA.name ?? "Image A"}
-            isLoading={isScanning}
-            onRegionClick={(r) => setSelectedRegion(r)}
-          />
+          <div style={{ maxWidth: "340px", margin: "0 auto", width: "100%" }}>
+            <BrainViewer
+              meshData={meshData}
+              activations={comparison?.activations.imageA ?? null}
+              label={comparison?.imageA.name ?? "Image A"}
+              isLoading={isScanning}
+              onRegionClick={(r) => setSelectedRegion(r)}
+              resetKey={comparison?.imageA.name}
+            />
+          </div>
         </div>
 
         {/* Brain B */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {comparison?.imageB.url && (
             <img
               src={comparison.imageB.url}
               alt={comparison.imageB.name}
-              style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", borderRadius: "4px", border: "1px solid #1e1e2e" }}
+              style={{ width: "100%", aspectRatio: "16/7", objectFit: "cover", borderRadius: "4px", border: "1px solid #1e1e2e" }}
             />
           )}
-          <BrainViewer
-            meshData={meshData}
-            activations={comparison?.activations.imageB ?? null}
-            label={comparison?.imageB.name ?? "Image B"}
-            isLoading={isScanning}
-            onRegionClick={(r) => setSelectedRegion(r)}
-          />
+          <div style={{ maxWidth: "340px", margin: "0 auto", width: "100%" }}>
+            <BrainViewer
+              meshData={meshData}
+              activations={comparison?.activations.imageB ?? null}
+              label={comparison?.imageB.name ?? "Image B"}
+              isLoading={isScanning}
+              onRegionClick={(r) => setSelectedRegion(r)}
+              resetKey={comparison?.imageB.name}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Color legend */}
+      {comparison && (
+        <div className="flex items-center gap-3 mt-2 fade-up fade-up-4" style={{ justifyContent: "center" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#8a8a9a" }}>LOW</span>
+          <div style={{
+            width: "180px", height: "8px", borderRadius: "4px",
+            background: "linear-gradient(to right, #1a3a5c, #ff8c00, #ff4d4d)",
+          }} />
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#8a8a9a" }}>HIGH</span>
+          <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#8a8a9a", marginLeft: "8px" }}>
+            brain activation — colors are per-brain, not comparable across the two
+          </span>
+        </div>
+      )}
 
       {/* Results: bars + explanation */}
       {comparison && (
