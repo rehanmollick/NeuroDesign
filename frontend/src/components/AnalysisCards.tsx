@@ -6,103 +6,65 @@ interface AnalysisCardsProps {
   comparison: ComparisonResult
 }
 
-function WinnerCard({ comparison }: { comparison: ComparisonResult }) {
-  const detailed = comparison.detailed
-  const winner = detailed?.winner
-  const winnerName = winner === "A" ? comparison.imageA.name : winner === "B" ? comparison.imageB.name : null
+interface InsightCardProps {
+  title: string
+  subtitle: string
+  content: string
+  accentColor: string
+  align: "left" | "right"
+}
 
-  const avgA = comparison.regions.reduce((sum, r) => sum + r.activationA, 0) / comparison.regions.length
-  const avgB = comparison.regions.reduce((sum, r) => sum + r.activationB, 0) / comparison.regions.length
-  const diff = Math.abs(avgA - avgB) * 100
-
+function InsightCard({ title, subtitle, content, accentColor, align }: InsightCardProps) {
+  if (!content) return null
   return (
-    <div className="analysis-card" style={{
-      background: "rgba(18, 18, 26, 0.8)",
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      border: "1px solid rgba(30, 30, 46, 0.6)",
+    <div style={{
+      width: "min(100%, 680px)",
+      marginLeft: align === "right" ? "auto" : 0,
+      marginRight: align === "left" ? "auto" : 0,
+      background: "#12121a",
+      border: "1px solid #1e1e2e",
+      borderLeft: `3px solid ${accentColor}`,
       borderRadius: "4px",
-      padding: "28px",
+      padding: "32px",
       position: "relative",
-      overflow: "hidden",
-      gridColumn: "1 / -1",
+      transition: "border-color 200ms ease-out, box-shadow 200ms ease-out",
     }}>
-      {/* Accent glow line */}
+      {/* Accent glow */}
       <div style={{
         position: "absolute",
-        top: 0, left: 0, right: 0,
-        height: "2px",
-        background: "linear-gradient(90deg, #00e5a0, #00b4d8, transparent)",
-      }} />
-      {/* Background glow */}
-      <div style={{
-        position: "absolute",
-        top: "-20px", left: "20px",
-        width: "200px", height: "80px",
-        background: "radial-gradient(circle, rgba(0,229,160,0.06), transparent)",
+        top: 0,
+        left: 0,
+        width: "60px",
+        height: "100%",
+        background: `linear-gradient(90deg, ${accentColor}08, transparent)`,
         pointerEvents: "none",
       }} />
 
-      <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
-        <div style={{ flex: 1, minWidth: "200px" }}>
-          <div className="hud-header" style={{ marginBottom: "12px" }}>
-            Overall Winner
-          </div>
-          <div style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "32px",
-            fontWeight: 700,
-            color: "#00e5a0",
-            letterSpacing: "-0.02em",
-            textShadow: "0 0 30px rgba(0,229,160,0.2)",
-          }}>
-            {winner === "tie" ? "TIE" : winnerName || (avgA > avgB ? comparison.imageA.name : comparison.imageB.name)}
-          </div>
-        </div>
-        <div style={{ flex: 2, minWidth: "250px" }}>
-          <div style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "14px",
-            color: "#8a8a9a",
-            lineHeight: 1.6,
-          }}>
-            {detailed?.winner_reason || `${diff.toFixed(1)}% stronger overall brain activation`}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function InsightCard({ title, content, accentColor }: { title: string; content: string; accentColor: string }) {
-  if (!content) return null
-  return (
-    <div className="analysis-card" style={{
-      background: "rgba(18, 18, 26, 0.7)",
-      backdropFilter: "blur(8px)",
-      WebkitBackdropFilter: "blur(8px)",
-      border: "1px solid rgba(30, 30, 46, 0.6)",
-      borderRadius: "4px",
-      padding: "24px",
-      position: "relative",
-      overflow: "hidden",
-    }}>
-      {/* Left accent bar */}
       <div style={{
-        position: "absolute",
-        top: "12px", bottom: "12px", left: 0,
-        width: "2px",
-        background: accentColor,
-        opacity: 0.5,
-      }} />
-      <div className="hud-header" style={{ marginBottom: "12px" }}>
+        fontFamily: "var(--font-mono)",
+        fontSize: "11px",
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        color: "#8a8a9a",
+        marginBottom: "6px",
+      }}>
+        {subtitle}
+      </div>
+      <div style={{
+        fontFamily: "var(--font-heading)",
+        fontSize: "20px",
+        fontWeight: 600,
+        color: accentColor,
+        letterSpacing: "-0.02em",
+        marginBottom: "16px",
+      }}>
         {title}
       </div>
       <div style={{
         fontFamily: "var(--font-sans)",
-        fontSize: "14px",
+        fontSize: "16px",
         color: "#e8e6e3",
-        lineHeight: 1.65,
+        lineHeight: 1.7,
       }}>
         {content}
       </div>
@@ -110,49 +72,49 @@ function InsightCard({ title, content, accentColor }: { title: string; content: 
   )
 }
 
-function RecommendationsCard({ recommendations }: { recommendations: string[] }) {
+function RecommendationsSection({ recommendations }: { recommendations: string[] }) {
   if (!recommendations || recommendations.length === 0) return null
   return (
-    <div className="analysis-card" style={{
-      background: "rgba(18, 18, 26, 0.7)",
-      backdropFilter: "blur(8px)",
-      WebkitBackdropFilter: "blur(8px)",
-      border: "1px solid rgba(30, 30, 46, 0.6)",
-      borderRadius: "4px",
-      padding: "24px",
-      gridColumn: "1 / -1",
-    }}>
-      <div className="hud-header" style={{ marginBottom: "20px" }}>
-        Design Recommendations
+    <div style={{ maxWidth: "700px" }}>
+      <div style={{
+        fontFamily: "var(--font-heading)",
+        fontSize: "20px",
+        fontWeight: 600,
+        color: "#e8e6e3",
+        letterSpacing: "-0.02em",
+        marginBottom: "28px",
+      }}>
+        What To Do Next
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         {recommendations.map((rec, i) => (
           <div key={i} style={{
             display: "flex",
-            gap: "16px",
+            gap: "20px",
             alignItems: "flex-start",
           }}>
             <div style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "13px",
-              color: "#00e5a0",
-              flexShrink: 0,
-              width: "24px",
-              height: "24px",
+              fontSize: "16px",
+              fontWeight: 600,
+              color: "#0a0a0f",
+              background: "#00e5a0",
+              width: "36px",
+              height: "36px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              border: "1px solid rgba(0,229,160,0.2)",
-              borderRadius: "4px",
-              background: "rgba(0,229,160,0.05)",
+              borderRadius: "6px",
+              flexShrink: 0,
             }}>
-              {i + 1}
+              {String(i + 1).padStart(2, "0")}
             </div>
             <span style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "14px",
+              fontSize: "16px",
               color: "#e8e6e3",
-              lineHeight: 1.5,
+              lineHeight: 1.6,
+              paddingTop: "6px",
             }}>
               {rec}
             </span>
@@ -167,28 +129,35 @@ export default function AnalysisCards({ comparison }: AnalysisCardsProps) {
   const d = comparison.detailed
 
   return (
-    <div className="analysis-grid" style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(2, 1fr)",
-      gap: "16px",
-    }}>
-      <WinnerCard comparison={comparison} />
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* Staggered insight cards */}
       <InsightCard
         title="Emotional Impact"
+        subtitle="How it makes people feel"
         content={d?.emotional_impact || ""}
         accentColor="#ff6b6b"
+        align="left"
       />
       <InsightCard
         title="Visual Attention"
+        subtitle="Where the eye goes first"
         content={d?.visual_attention || ""}
-        accentColor="#00e5a0"
+        accentColor="#00b4d8"
+        align="right"
       />
       <InsightCard
         title="Memory Retention"
+        subtitle="What sticks in the mind"
         content={d?.memory_retention || ""}
-        accentColor="#00b4d8"
+        accentColor="#f5a623"
+        align="left"
       />
-      <RecommendationsCard recommendations={d?.recommendations || []} />
+
+      {/* Section connector */}
+      <div className="section-connector" />
+
+      {/* Recommendations */}
+      <RecommendationsSection recommendations={d?.recommendations || []} />
     </div>
   )
 }

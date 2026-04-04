@@ -1,5 +1,7 @@
 "use client"
 
+import { useRef } from "react"
+import { useInView } from "framer-motion"
 import { ComparisonResult } from "@/lib/types"
 
 interface TopDifferencesProps {
@@ -7,6 +9,9 @@ interface TopDifferencesProps {
 }
 
 export default function TopDifferences({ regions }: TopDifferencesProps) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: "-60px" })
+
   const sorted = [...regions]
     .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
     .slice(0, 6)
@@ -14,130 +19,155 @@ export default function TopDifferences({ regions }: TopDifferencesProps) {
   const maxVal = Math.max(...sorted.map((r) => Math.max(r.activationA, r.activationB)))
 
   return (
-    <div style={{
-      background: "rgba(18, 18, 26, 0.7)",
-      backdropFilter: "blur(8px)",
-      WebkitBackdropFilter: "blur(8px)",
-      border: "1px solid rgba(30, 30, 46, 0.6)",
-      borderRadius: "4px",
-      padding: "24px",
-    }}>
-      <div className="hud-header" style={{ marginBottom: "24px" }}>
+    <div ref={ref} style={{ width: "100%" }}>
+      <div style={{
+        fontFamily: "var(--font-heading)",
+        fontSize: "20px",
+        fontWeight: 600,
+        color: "#e8e6e3",
+        letterSpacing: "-0.02em",
+        marginBottom: "28px",
+      }}>
         Brain Region Comparison
       </div>
 
       {/* Vertical bar chart */}
       <div style={{
-        display: "flex",
-        gap: "8px",
-        alignItems: "flex-end",
-        height: "180px",
-        padding: "0 4px",
-        borderBottom: "1px solid #1e1e2e",
+        background: "#12121a",
+        border: "1px solid #1e1e2e",
+        borderRadius: "4px",
+        padding: "32px",
       }}>
-        {sorted.map((region) => {
-          const heightA = maxVal > 0 ? (region.activationA / maxVal) * 100 : 0
-          const heightB = maxVal > 0 ? (region.activationB / maxVal) * 100 : 0
+        <div style={{
+          display: "flex",
+          gap: "12px",
+          alignItems: "flex-end",
+          height: "240px",
+          padding: "0 8px",
+          borderBottom: "1px solid #1e1e2e",
+        }}>
+          {sorted.map((region, i) => {
+            const heightA = maxVal > 0 ? (region.activationA / maxVal) * 100 : 0
+            const heightB = maxVal > 0 ? (region.activationB / maxVal) * 100 : 0
 
-          return (
+            return (
+              <div
+                key={region.name}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  height: "100%",
+                  justifyContent: "flex-end",
+                  gap: "4px",
+                }}
+              >
+                {/* Value labels */}
+                <div style={{
+                  display: "flex",
+                  gap: "4px",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11px",
+                }}>
+                  <span style={{ color: "#00e5a0" }}>{(region.activationA * 100).toFixed(0)}</span>
+                  <span style={{ color: "#00b4d8" }}>{(region.activationB * 100).toFixed(0)}</span>
+                </div>
+                {/* Bars */}
+                <div style={{
+                  display: "flex",
+                  gap: "4px",
+                  alignItems: "flex-end",
+                  height: "calc(100% - 24px)",
+                }}>
+                  <div style={{
+                    width: "24px",
+                    height: isInView ? `${heightA}%` : "0%",
+                    background: "linear-gradient(180deg, #00e5a0, #00e5a044)",
+                    borderRadius: "3px 3px 0 0",
+                    transition: `height 600ms ease-out ${i * 100}ms`,
+                    minHeight: isInView ? "4px" : "0px",
+                    boxShadow: "0 0 12px rgba(0,229,160,0.15)",
+                  }} />
+                  <div style={{
+                    width: "24px",
+                    height: isInView ? `${heightB}%` : "0%",
+                    background: "linear-gradient(180deg, #00b4d8, #00b4d844)",
+                    borderRadius: "3px 3px 0 0",
+                    transition: `height 600ms ease-out ${i * 100 + 50}ms`,
+                    minHeight: isInView ? "4px" : "0px",
+                    boxShadow: "0 0 12px rgba(0,180,216,0.15)",
+                  }} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Labels */}
+        <div style={{
+          display: "flex",
+          gap: "12px",
+          marginTop: "12px",
+        }}>
+          {sorted.map((region) => (
             <div
               key={region.name}
               style={{
                 flex: 1,
-                display: "flex",
-                gap: "3px",
-                alignItems: "flex-end",
-                justifyContent: "center",
-                height: "100%",
+                textAlign: "center",
               }}
             >
-              {/* Bar A */}
               <div style={{
-                width: "16px",
-                height: `${heightA}%`,
-                background: "linear-gradient(180deg, #00e5a0, #00e5a044)",
-                borderRadius: "3px 3px 0 0",
-                transition: "height 600ms ease-out",
-                minHeight: "4px",
-                boxShadow: "0 0 8px rgba(0,229,160,0.15)",
-              }} />
-              {/* Bar B */}
+                fontFamily: "var(--font-mono)",
+                fontSize: "12px",
+                color: "#e8e6e3",
+                lineHeight: 1.3,
+                marginBottom: "4px",
+              }}>
+                {region.displayName}
+              </div>
               <div style={{
-                width: "16px",
-                height: `${heightB}%`,
-                background: "linear-gradient(180deg, #00b4d8, #00b4d844)",
-                borderRadius: "3px 3px 0 0",
-                transition: "height 600ms ease-out",
-                minHeight: "4px",
-                boxShadow: "0 0 8px rgba(0,180,216,0.15)",
-              }} />
+                fontFamily: "var(--font-mono)",
+                fontSize: "13px",
+                fontWeight: 500,
+                color: region.delta > 0 ? "#00b4d8" : "#00e5a0",
+              }}>
+                {region.delta > 0 ? "+" : ""}{(region.delta * 100).toFixed(0)}%
+              </div>
             </div>
-          )
-        })}
-      </div>
-
-      {/* Labels */}
-      <div style={{
-        display: "flex",
-        gap: "8px",
-        marginTop: "8px",
-      }}>
-        {sorted.map((region) => (
-          <div
-            key={region.name}
-            style={{
-              flex: 1,
-              textAlign: "center",
-            }}
-          >
-            <div style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "10px",
-              color: "#e8e6e3",
-              lineHeight: 1.3,
-              marginBottom: "2px",
-            }}>
-              {region.displayName}
-            </div>
-            <div style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "10px",
-              color: region.delta > 0 ? "#00b4d8" : "#00e5a0",
-            }}>
-              {region.delta > 0 ? "+" : ""}{(region.delta * 100).toFixed(0)}%
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Legend */}
-      <div style={{
-        display: "flex",
-        gap: "16px",
-        marginTop: "16px",
-        justifyContent: "center",
-      }}>
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          fontFamily: "var(--font-mono)",
-          fontSize: "11px",
-          color: "#8a8a9a",
-        }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: "#00e5a0" }} />
-          IMAGE A
+          ))}
         </div>
+
+        {/* Legend */}
         <div style={{
           display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          fontFamily: "var(--font-mono)",
-          fontSize: "11px",
-          color: "#8a8a9a",
+          gap: "24px",
+          marginTop: "20px",
+          justifyContent: "center",
         }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: "#00b4d8" }} />
-          IMAGE B
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "13px",
+            color: "#8a8a9a",
+          }}>
+            <div style={{ width: 12, height: 12, borderRadius: 3, background: "#00e5a0" }} />
+            IMAGE A
+          </div>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "13px",
+            color: "#8a8a9a",
+          }}>
+            <div style={{ width: 12, height: 12, borderRadius: 3, background: "#00b4d8" }} />
+            IMAGE B
+          </div>
         </div>
       </div>
     </div>

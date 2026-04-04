@@ -10,7 +10,7 @@ import PresetTabs from "@/components/PresetTabs"
 import UploadZone from "@/components/UploadZone"
 import CompareButton from "@/components/CompareButton"
 import TopDifferences from "@/components/TopDifferences"
-import Interpretation from "@/components/Interpretation"
+import VerdictSection from "@/components/VerdictSection"
 import AnalysisCards from "@/components/AnalysisCards"
 import ChatAdvisor from "@/components/ChatAdvisor"
 import RegionDetail from "@/components/RegionDetail"
@@ -33,9 +33,9 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.4, ease: "easeOut", delay }}
+      initial={{ opacity: 0, y: 24 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+      transition={{ duration: 0.5, ease: "easeOut", delay }}
     >
       {children}
     </motion.div>
@@ -52,6 +52,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
   const [scanning, setScanning] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
 
   useEffect(() => {
     fetch("/data/mesh.json")
@@ -163,44 +164,75 @@ export default function Home() {
           }}>
             {/* Column A */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* Upload or Image A */}
-              {comparison?.imageA.url && !fileA ? (
-                <div style={{
-                  position: "relative",
-                  borderRadius: "4px",
-                  overflow: "hidden",
-                  border: "1px solid #1e1e2e",
-                }}>
-                  <img
-                    src={comparison.imageA.url}
-                    alt={comparison.imageA.name}
-                    style={{
-                      width: "100%",
-                      aspectRatio: "16/10",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
+              {/* Image display or upload */}
+              {fileA ? (
+                // User uploaded: show their upload with remove option
+                <div>
                   <div style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: "8px 12px",
-                    background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "#00e5a0",
+                    marginBottom: "6px",
                   }}>
-                    <span style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "11px",
-                      color: "#e8e6e3",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
+                    Your Image A
+                  </div>
+                  <UploadZone label="image A" file={fileA} onFileSelect={handleFileA} />
+                </div>
+              ) : comparison?.imageA.url ? (
+                // Preset active: show preset image + upload overlay
+                <div style={{ position: "relative" }}>
+                  <div style={{
+                    position: "relative",
+                    borderRadius: "4px",
+                    overflow: "hidden",
+                    border: "1px solid #1e1e2e",
+                  }}>
+                    <img
+                      src={comparison.imageA.url}
+                      alt={comparison.imageA.name}
+                      style={{
+                        width: "100%",
+                        aspectRatio: "16/10",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                    <div style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: "8px 12px",
+                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
                     }}>
-                      {comparison.imageA.name}
-                    </span>
+                      <span style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                        color: "#e8e6e3",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}>
+                        {comparison.imageA.name}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Upload overlay */}
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      opacity: 0.6,
+                      transition: "opacity 200ms ease-out",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6" }}
+                  >
+                    <UploadZone label="image A" file={null} onFileSelect={handleFileA} compact />
                   </div>
                 </div>
               ) : (
+                // No preset, no upload: show full upload zone
                 <div>
                   <div style={{
                     fontFamily: "var(--font-mono)",
@@ -223,7 +255,6 @@ export default function Home() {
                 width: "100%",
                 position: "relative",
               }}>
-                {/* Scan sweep */}
                 {scanning && (
                   <div style={{
                     position: "absolute", inset: 0, zIndex: 5, pointerEvents: "none",
@@ -249,40 +280,67 @@ export default function Home() {
 
             {/* Column B */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {comparison?.imageB.url && !fileB ? (
-                <div style={{
-                  position: "relative",
-                  borderRadius: "4px",
-                  overflow: "hidden",
-                  border: "1px solid #1e1e2e",
-                }}>
-                  <img
-                    src={comparison.imageB.url}
-                    alt={comparison.imageB.name}
-                    style={{
-                      width: "100%",
-                      aspectRatio: "16/10",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
+              {fileB ? (
+                <div>
                   <div style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: "8px 12px",
-                    background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "#00b4d8",
+                    marginBottom: "6px",
                   }}>
-                    <span style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "11px",
-                      color: "#e8e6e3",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
+                    Your Image B
+                  </div>
+                  <UploadZone label="image B" file={fileB} onFileSelect={handleFileB} />
+                </div>
+              ) : comparison?.imageB.url ? (
+                <div style={{ position: "relative" }}>
+                  <div style={{
+                    position: "relative",
+                    borderRadius: "4px",
+                    overflow: "hidden",
+                    border: "1px solid #1e1e2e",
+                  }}>
+                    <img
+                      src={comparison.imageB.url}
+                      alt={comparison.imageB.name}
+                      style={{
+                        width: "100%",
+                        aspectRatio: "16/10",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                    <div style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: "8px 12px",
+                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
                     }}>
-                      {comparison.imageB.name}
-                    </span>
+                      <span style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                        color: "#e8e6e3",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}>
+                        {comparison.imageB.name}
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      opacity: 0.6,
+                      transition: "opacity 200ms ease-out",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6" }}
+                  >
+                    <UploadZone label="image B" file={null} onFileSelect={handleFileB} compact />
                   </div>
                 </div>
               ) : (
@@ -344,25 +402,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Upload hint when presets active */}
-          {activePreset && !fileA && !fileB && (
-            <div style={{
-              marginTop: "16px",
-              display: "flex",
-              gap: "12px",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <span style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "13px",
-                color: "#4a4a5a",
-              }}>
-                or drop your own images to compare
-              </span>
-            </div>
-          )}
-
           {/* Color legend */}
           <div style={{
             display: "flex",
@@ -384,7 +423,7 @@ export default function Home() {
             <div style={{
               marginTop: "16px",
               fontFamily: "var(--font-sans)",
-              fontSize: "13px",
+              fontSize: "14px",
               color: pageState === "error" ? "#ff6b6b" : "#8a8a9a",
               padding: "12px 16px",
               border: `1px solid ${pageState === "error" ? "#ff6b6b33" : "#1e1e2e"}`,
@@ -397,49 +436,61 @@ export default function Home() {
         </div>
       </section>
 
-      {/* === ANALYSIS SECTION === scrollable */}
+      {/* === ANALYSIS SECTION === cinematic story flow */}
       {comparison && (
         <section style={{
           background: "#0a0a0f",
-          padding: "48px clamp(20px, 5vw, 48px)",
+          padding: "0 clamp(20px, 5vw, 48px)",
           position: "relative",
         }}>
           <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-            {/* Interpretation */}
+
+            {/* Section connector */}
+            <div className="section-connector" />
+
+            {/* VERDICT — the centerpiece */}
             <FadeIn>
-              <Interpretation
-                summary={comparison.summary}
-                error={!comparison.summary && pageState === "results"}
-              />
+              <VerdictSection comparison={comparison} />
             </FadeIn>
 
-            {/* Neon divider */}
-            <div className="neon-line" style={{ margin: "32px 0" }} />
+            {/* Section connector */}
+            <div className="section-connector" />
 
-            {/* Analysis Cards */}
+            {/* INSIGHTS + RECOMMENDATIONS */}
             <FadeIn delay={0.1}>
-              <div>
-                <div className="hud-header" style={{ marginBottom: "20px" }}>
+              <div style={{ padding: "40px 0" }}>
+                <div style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "12px",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  color: "#8a8a9a",
+                  marginBottom: "32px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}>
+                  <span style={{
+                    width: "24px",
+                    height: "1px",
+                    background: "#8a8a9a",
+                  }} />
                   Detailed Analysis
                 </div>
                 <AnalysisCards comparison={comparison} />
               </div>
             </FadeIn>
 
-            {/* Neon divider */}
-            <div className="neon-line" style={{ margin: "40px 0" }} />
+            {/* Section connector */}
+            <div className="section-connector" />
 
-            {/* Brain Region Comparison + Chat side by side */}
+            {/* BRAIN REGION CHART — full width */}
             <FadeIn delay={0.15}>
-              <div className="analysis-grid" style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "24px",
-              }}>
+              <div style={{ padding: "40px 0" }}>
                 <TopDifferences regions={comparison.regions} />
-                <ChatAdvisor comparison={comparison} />
               </div>
             </FadeIn>
+
           </div>
         </section>
       )}
@@ -463,6 +514,44 @@ export default function Home() {
             style={{ color: "#8a8a9a", textDecoration: "none" }}>Google Gemma 4</a>
         </p>
       </footer>
+
+      {/* Chat FAB button */}
+      {comparison && !chatOpen && (
+        <button
+          onClick={() => setChatOpen(true)}
+          style={{
+            position: "fixed",
+            bottom: "28px",
+            right: "28px",
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            background: "#00e5a0",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 80,
+            animation: "fabPulse 2s ease-in-out infinite",
+            transition: "transform 200ms ease-out",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.1)" }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)" }}
+          aria-label="Open Design Advisor chat"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" strokeWidth="2" strokeLinecap="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+        </button>
+      )}
+
+      {/* Chat sidebar */}
+      <ChatAdvisor
+        comparison={comparison}
+        isOpen={chatOpen}
+        onClose={() => setChatOpen(false)}
+      />
 
       <RegionDetail region={selectedRegionData} onClose={() => setSelectedRegion(null)} />
     </main>
