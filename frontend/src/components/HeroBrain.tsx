@@ -91,7 +91,7 @@ function SynapsingBrain({ meshData }: { meshData: MeshData }) {
   })
 
   return (
-    <group rotation={[0, -Math.PI / 2, 0]}>
+    <group rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
       <mesh ref={meshRef} geometry={geometry}>
         <meshStandardMaterial
           vertexColors
