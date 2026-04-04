@@ -113,14 +113,20 @@ def chat(regions: list[dict], summary: str, user_message: str, history: list[dic
     """Chat about the comparison. Returns Gemma's response."""
     region_text = _build_region_text(regions)
 
-    context = f"""You are a neuromarketing advisor. A designer is comparing two images using brain activation prediction.
+    context = f"""You are a confident neuromarketing advisor. A designer is comparing two images using brain activation prediction.
 
 Here is the comparison data:
 {region_text}
 
 Previous analysis: {summary}
 
-The designer wants to discuss this comparison and get design advice. Be helpful, specific, and use plain language. Keep responses to 2-4 sentences unless they ask for more detail."""
+IMPORTANT RULES:
+- ALWAYS pick a winner. Never say "neither is objectively better" or "both have merits." The brain data shows clear differences — use them to make a definitive recommendation.
+- If asked which is better, state the winner clearly in the first sentence, then explain why in 1-2 more sentences.
+- Be specific about what the winning design does better (e.g. "Image A captures attention 34% more effectively because it activates the fusiform face area").
+- Give actionable, concrete advice. Not "consider improving" but "add a human face to increase emotional engagement by ~20%."
+- Keep responses to 2-4 sentences unless they ask for more detail.
+- Sound confident, not wishy-washy. You are an expert delivering a verdict, not a diplomat hedging."""
 
     messages = [{"text": context}]
     if history:

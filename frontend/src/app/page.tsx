@@ -53,6 +53,8 @@ export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
   const [scanning, setScanning] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
+  const [previewA, setPreviewA] = useState<string | null>(null)
+  const [previewB, setPreviewB] = useState<string | null>(null)
 
   useEffect(() => {
     fetch("/data/mesh.json")
@@ -82,6 +84,10 @@ export default function Home() {
     setActivePreset(presetId)
     setFileA(null)
     setFileB(null)
+    if (previewA) URL.revokeObjectURL(previewA)
+    if (previewB) URL.revokeObjectURL(previewB)
+    setPreviewA(null)
+    setPreviewB(null)
     setError(null)
     try {
       const data = await loadPreset(presetId)
@@ -95,13 +101,27 @@ export default function Home() {
 
   const handleFileA = useCallback((file: File | null) => {
     setFileA(file)
-    if (file) { setActivePreset(null); setPageState("uploading") }
-  }, [])
+    if (previewA) URL.revokeObjectURL(previewA)
+    if (file) {
+      setPreviewA(URL.createObjectURL(file))
+      setActivePreset(null)
+      setPageState("uploading")
+    } else {
+      setPreviewA(null)
+    }
+  }, [previewA])
 
   const handleFileB = useCallback((file: File | null) => {
     setFileB(file)
-    if (file) { setActivePreset(null); setPageState("uploading") }
-  }, [])
+    if (previewB) URL.revokeObjectURL(previewB)
+    if (file) {
+      setPreviewB(URL.createObjectURL(file))
+      setActivePreset(null)
+      setPageState("uploading")
+    } else {
+      setPreviewB(null)
+    }
+  }, [previewB])
 
   const handleCompare = useCallback(async () => {
     if (!fileA || !fileB) { setError("Please upload both images"); return }
@@ -165,20 +185,62 @@ export default function Home() {
             {/* Column A */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {/* Image display or upload */}
-              {fileA ? (
-                // User uploaded: show their upload with remove option
-                <div>
+              {fileA && previewA ? (
+                // User uploaded: show full-size preview with swap option
+                <div style={{ position: "relative" }}>
                   <div style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "11px",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#00e5a0",
-                    marginBottom: "6px",
+                    position: "relative",
+                    borderRadius: "4px",
+                    overflow: "hidden",
+                    border: "1px solid #00e5a033",
                   }}>
-                    Your Image A
+                    <img
+                      src={previewA}
+                      alt="Your Image A"
+                      style={{
+                        width: "100%",
+                        aspectRatio: "16/10",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                    <div style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: "8px 12px",
+                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}>
+                      <span style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                        color: "#00e5a0",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}>
+                        Your Image A
+                      </span>
+                      <button
+                        onClick={() => handleFileA(null)}
+                        style={{
+                          background: "rgba(255,107,107,0.2)",
+                          border: "1px solid rgba(255,107,107,0.3)",
+                          borderRadius: "3px",
+                          color: "#ff6b6b",
+                          fontSize: "11px",
+                          padding: "2px 8px",
+                          cursor: "pointer",
+                          fontFamily: "var(--font-mono)",
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
-                  <UploadZone label="image A" file={fileA} onFileSelect={handleFileA} />
                 </div>
               ) : comparison?.imageA.url ? (
                 // Preset active: show preset image + upload overlay
@@ -280,19 +342,61 @@ export default function Home() {
 
             {/* Column B */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {fileB ? (
-                <div>
+              {fileB && previewB ? (
+                <div style={{ position: "relative" }}>
                   <div style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "11px",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#00b4d8",
-                    marginBottom: "6px",
+                    position: "relative",
+                    borderRadius: "4px",
+                    overflow: "hidden",
+                    border: "1px solid #00b4d833",
                   }}>
-                    Your Image B
+                    <img
+                      src={previewB}
+                      alt="Your Image B"
+                      style={{
+                        width: "100%",
+                        aspectRatio: "16/10",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                    <div style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: "8px 12px",
+                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}>
+                      <span style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                        color: "#00b4d8",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}>
+                        Your Image B
+                      </span>
+                      <button
+                        onClick={() => handleFileB(null)}
+                        style={{
+                          background: "rgba(255,107,107,0.2)",
+                          border: "1px solid rgba(255,107,107,0.3)",
+                          borderRadius: "3px",
+                          color: "#ff6b6b",
+                          fontSize: "11px",
+                          padding: "2px 8px",
+                          cursor: "pointer",
+                          fontFamily: "var(--font-mono)",
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
-                  <UploadZone label="image B" file={fileB} onFileSelect={handleFileB} />
                 </div>
               ) : comparison?.imageB.url ? (
                 <div style={{ position: "relative" }}>

@@ -33,11 +33,11 @@ function SynapsingBrain({ meshData }: { meshData: MeshData }) {
     geo.computeVertexNormals()
 
     const colors = new Float32Array(meshData.vertices.length * 3)
-    // Base color: silver-ish #c0c0c8
+    // Darker silver base: #8a8a96 — metallic gray, NOT white
     for (let i = 0; i < meshData.vertices.length; i++) {
-      colors[i * 3] = 0.75
-      colors[i * 3 + 1] = 0.75
-      colors[i * 3 + 2] = 0.78
+      colors[i * 3] = 0.54
+      colors[i * 3 + 1] = 0.54
+      colors[i * 3 + 2] = 0.59
     }
     geo.setAttribute("color", new THREE.BufferAttribute(colors, 3))
     return geo
@@ -62,12 +62,12 @@ function SynapsingBrain({ meshData }: { meshData: MeshData }) {
 
     // Reset all to silver base
     for (let i = 0; i < meshData.vertices.length; i++) {
-      colors[i * 3] = 0.75
-      colors[i * 3 + 1] = 0.75
-      colors[i * 3 + 2] = 0.78
+      colors[i * 3] = 0.54
+      colors[i * 3 + 1] = 0.54
+      colors[i * 3 + 2] = 0.59
     }
 
-    // Apply pulses — bright green flash
+    // Apply pulses
     const toRemove: string[] = []
     activeRegions.current.forEach((startTime, region) => {
       const age = elapsed - startTime
@@ -80,7 +80,6 @@ function SynapsingBrain({ meshData }: { meshData: MeshData }) {
       const indices = meshData.regionMap[region]
       if (!indices) return
       for (const idx of indices) {
-        // Blend toward bright accent green #00ffc8
         colors[idx * 3] = colors[idx * 3] * (1 - intensity) + 0.0 * intensity
         colors[idx * 3 + 1] = colors[idx * 3 + 1] * (1 - intensity) + 1.0 * intensity
         colors[idx * 3 + 2] = colors[idx * 3 + 2] * (1 - intensity) + 0.78 * intensity
@@ -96,9 +95,9 @@ function SynapsingBrain({ meshData }: { meshData: MeshData }) {
       <mesh ref={meshRef} geometry={geometry}>
         <meshStandardMaterial
           vertexColors
-          metalness={0.8}
-          roughness={0.15}
-          envMapIntensity={1.2}
+          metalness={0.95}
+          roughness={0.08}
+          envMapIntensity={0.6}
         />
       </mesh>
     </group>
@@ -161,16 +160,16 @@ export default function HeroBrain({ meshData }: HeroBrainProps) {
       style={{ background: "transparent", width: "100%", height: "100%" }}
       aria-label="Interactive 3D brain with synapse pulse animation"
     >
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 5, 5]} intensity={2.0} color="#ffffff" />
-      <directionalLight position={[-5, 3, -2]} intensity={1.5} color="#00e5a0" />
-      <directionalLight position={[0, -3, 5]} intensity={0.8} color="#00b4d8" />
-      <Environment preset="city" />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[5, 5, 5]} intensity={1.2} color="#ffffff" />
+      <directionalLight position={[-5, 3, -2]} intensity={0.6} color="#00e5a0" />
+      <directionalLight position={[0, -3, 5]} intensity={0.3} color="#00b4d8" />
+      <Environment preset="night" />
       <SynapsingBrain meshData={meshData} />
       <HeroParticles />
       <OrbitControls
         autoRotate
-        autoRotateSpeed={0.3}
+        autoRotateSpeed={0.4}
         enableZoom={false}
         enablePan={false}
       />
