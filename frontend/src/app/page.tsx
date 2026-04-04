@@ -152,9 +152,11 @@ export default function Home() {
           {/* Preset tabs */}
           <PresetTabs activePreset={activePreset} onSelect={handlePresetSelect} />
 
+          {/* Neon divider */}
+          <div className="neon-line" style={{ marginTop: "20px", marginBottom: "20px" }} />
+
           {/* Upload + Images + Brains: all on one screen */}
-          <div style={{
-            marginTop: "20px",
+          <div className="tool-grid" style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "20px",
@@ -400,7 +402,7 @@ export default function Home() {
         <section style={{
           background: "#0a0a0f",
           padding: "48px clamp(20px, 5vw, 48px)",
-          borderTop: "1px solid #1e1e2e",
+          position: "relative",
         }}>
           <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
             {/* Interpretation */}
@@ -411,27 +413,25 @@ export default function Home() {
               />
             </FadeIn>
 
+            {/* Neon divider */}
+            <div className="neon-line" style={{ margin: "32px 0" }} />
+
             {/* Analysis Cards */}
             <FadeIn delay={0.1}>
-              <div style={{ marginTop: "32px" }}>
-                <div style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "11px",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "#8a8a9a",
-                  marginBottom: "16px",
-                }}>
+              <div>
+                <div className="hud-header" style={{ marginBottom: "20px" }}>
                   Detailed Analysis
                 </div>
                 <AnalysisCards comparison={comparison} />
               </div>
             </FadeIn>
 
+            {/* Neon divider */}
+            <div className="neon-line" style={{ margin: "40px 0" }} />
+
             {/* Brain Region Comparison + Chat side by side */}
             <FadeIn delay={0.15}>
-              <div style={{
-                marginTop: "48px",
+              <div className="analysis-grid" style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
                 gap: "24px",

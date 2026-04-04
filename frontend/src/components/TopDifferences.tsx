@@ -14,17 +14,17 @@ export default function TopDifferences({ regions }: TopDifferencesProps) {
   const maxVal = Math.max(...sorted.map((r) => Math.max(r.activationA, r.activationB)))
 
   return (
-    <div>
-      <h3 style={{
-        fontFamily: "var(--font-mono)",
-        fontSize: "11px",
-        letterSpacing: "0.1em",
-        textTransform: "uppercase",
-        color: "#8a8a9a",
-        marginBottom: "24px",
-      }}>
+    <div style={{
+      background: "rgba(18, 18, 26, 0.7)",
+      backdropFilter: "blur(8px)",
+      WebkitBackdropFilter: "blur(8px)",
+      border: "1px solid rgba(30, 30, 46, 0.6)",
+      borderRadius: "4px",
+      padding: "24px",
+    }}>
+      <div className="hud-header" style={{ marginBottom: "24px" }}>
         Brain Region Comparison
-      </h3>
+      </div>
 
       {/* Vertical bar chart */}
       <div style={{
@@ -55,19 +55,21 @@ export default function TopDifferences({ regions }: TopDifferencesProps) {
               <div style={{
                 width: "16px",
                 height: `${heightA}%`,
-                background: "linear-gradient(180deg, #00e5a0, #00e5a066)",
+                background: "linear-gradient(180deg, #00e5a0, #00e5a044)",
                 borderRadius: "3px 3px 0 0",
                 transition: "height 600ms ease-out",
                 minHeight: "4px",
+                boxShadow: "0 0 8px rgba(0,229,160,0.15)",
               }} />
               {/* Bar B */}
               <div style={{
                 width: "16px",
                 height: `${heightB}%`,
-                background: "linear-gradient(180deg, #00b4d8, #00b4d866)",
+                background: "linear-gradient(180deg, #00b4d8, #00b4d844)",
                 borderRadius: "3px 3px 0 0",
                 transition: "height 600ms ease-out",
                 minHeight: "4px",
+                boxShadow: "0 0 8px rgba(0,180,216,0.15)",
               }} />
             </div>
           )

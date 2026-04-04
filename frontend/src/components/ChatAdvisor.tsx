@@ -59,8 +59,10 @@ export default function ChatAdvisor({ comparison }: ChatAdvisorProps) {
 
   return (
     <div style={{
-      background: "#12121a",
-      border: "1px solid #1e1e2e",
+      background: "rgba(18, 18, 26, 0.7)",
+      backdropFilter: "blur(12px)",
+      WebkitBackdropFilter: "blur(12px)",
+      border: "1px solid rgba(30, 30, 46, 0.6)",
       borderRadius: "4px",
       overflow: "hidden",
       display: "flex",
@@ -80,7 +82,7 @@ export default function ChatAdvisor({ comparison }: ChatAdvisorProps) {
           height: "8px",
           borderRadius: "50%",
           background: "#00e5a0",
-          boxShadow: "0 0 8px #00e5a044",
+          animation: "glowPulse 2s ease-in-out infinite",
         }} />
         <span style={{
           fontFamily: "var(--font-mono)",

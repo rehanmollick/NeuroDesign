@@ -22,16 +22,27 @@ export default function HeroSection({ meshData }: HeroSectionProps) {
       overflow: "hidden",
       padding: "0 clamp(20px, 5vw, 80px)",
     }}>
-      {/* Subtle radial glow behind brain */}
+      {/* Dramatic radial glow behind brain */}
       <div style={{
         position: "absolute",
-        right: "10%",
+        right: "5%",
         top: "50%",
         transform: "translateY(-50%)",
-        width: "600px",
-        height: "600px",
-        background: "radial-gradient(circle, rgba(0,229,160,0.04) 0%, transparent 70%)",
+        width: "700px",
+        height: "700px",
+        background: "radial-gradient(circle, rgba(0,229,160,0.06) 0%, rgba(0,180,216,0.03) 40%, transparent 70%)",
         pointerEvents: "none",
+      }} />
+      {/* Secondary glow for depth */}
+      <div style={{
+        position: "absolute",
+        right: "15%",
+        top: "40%",
+        width: "400px",
+        height: "400px",
+        background: "radial-gradient(circle, rgba(0,229,160,0.08) 0%, transparent 60%)",
+        pointerEvents: "none",
+        filter: "blur(60px)",
       }} />
 
       {/* Content grid: text left, brain right */}
@@ -156,12 +167,25 @@ export default function HeroSection({ meshData }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* Right: brain */}
+        {/* Right: brain with glow ring */}
         <div style={{
           height: "min(70vh, 600px)",
           cursor: "crosshair",
           position: "relative",
         }}>
+          {/* Glow ring behind brain */}
+          <div style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "70%",
+            height: "70%",
+            borderRadius: "50%",
+            border: "1px solid rgba(0,229,160,0.1)",
+            boxShadow: "0 0 60px rgba(0,229,160,0.05), inset 0 0 60px rgba(0,229,160,0.03)",
+            pointerEvents: "none",
+          }} />
           <HeroBrain meshData={meshData} />
         </div>
       </div>

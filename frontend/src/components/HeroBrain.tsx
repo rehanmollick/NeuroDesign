@@ -81,10 +81,10 @@ function SynapsingBrain({ meshData }: { meshData: MeshData }) {
       const indices = meshData.regionMap[region]
       if (!indices) return
       for (const idx of indices) {
-        // Blend toward accent green #00e5a0
-        colors[idx * 3] = colors[idx * 3] + (0 - colors[idx * 3]) * intensity
-        colors[idx * 3 + 1] = colors[idx * 3 + 1] + (0xe5 / 255 - colors[idx * 3 + 1]) * intensity
-        colors[idx * 3 + 2] = colors[idx * 3 + 2] + (0xa0 / 255 - colors[idx * 3 + 2]) * intensity
+        // Blend toward bright accent green #00ffc8 (brighter than base accent)
+        colors[idx * 3] = colors[idx * 3] + (0.1 - colors[idx * 3]) * intensity
+        colors[idx * 3 + 1] = colors[idx * 3 + 1] + (1.0 - colors[idx * 3 + 1]) * intensity
+        colors[idx * 3 + 2] = colors[idx * 3 + 2] + (0.78 - colors[idx * 3 + 2]) * intensity
       }
     })
     toRemove.forEach((r) => activeRegions.current.delete(r))

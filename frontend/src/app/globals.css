@@ -37,6 +37,12 @@ body {
   50% { opacity: 0.7; }
 }
 
+/* Subtle glow pulse for live indicators */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(0,229,160,0.2); }
+  50% { box-shadow: 0 0 16px rgba(0,229,160,0.4); }
+}
+
 /* Hide scrollbar for preset tabs */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -68,27 +74,79 @@ body {
   top: 16px;
 }
 
-/* Subtle grid texture on sections */
+/* Grid texture on tool section */
 #tool {
   background-image:
-    linear-gradient(rgba(30, 30, 46, 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 30, 46, 0.15) 1px, transparent 1px);
+    linear-gradient(rgba(30, 30, 46, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 30, 46, 0.12) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
-/* Glow effect for accent elements */
-.glow-green {
-  box-shadow: 0 0 16px rgba(0, 229, 160, 0.15);
+/* Glassmorphism card base */
+.glass-card {
+  background: rgba(18, 18, 26, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 30, 46, 0.6);
+  border-radius: 4px;
+}
+
+/* Neon glow accent line */
+.neon-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,229,160,0.4), rgba(0,180,216,0.3), transparent);
+}
+
+/* HUD-style section header */
+.hud-header {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hud-header::before {
+  content: "";
+  width: 16px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* Analysis card hover effect */
+.analysis-card {
+  transition: border-color 200ms ease-out, box-shadow 200ms ease-out;
+}
+.analysis-card:hover {
+  border-color: rgba(0,229,160,0.2);
+  box-shadow: 0 0 24px rgba(0,229,160,0.04);
+}
+
+/* Chat input focus */
+.chat-input:focus {
+  border-color: rgba(0,229,160,0.3) !important;
+  box-shadow: 0 0 12px rgba(0,229,160,0.06);
 }
 
 /* Mobile responsive */
 @media (max-width: 767px) {
   .brain-grid,
-  #tool > div > div:nth-child(2) {
+  .tool-grid {
     grid-template-columns: 1fr !important;
   }
 
-  #demo, #tool {
+  .analysis-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #tool {
     padding: 20px !important;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr !important;
   }
 }
