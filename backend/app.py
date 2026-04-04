@@ -14,7 +14,7 @@ image = (
         "python-multipart",
         "pillow",
         "numpy",
-        "moviepy==1.0.3",
+        "opencv-python-headless",
         "nilearn",
         "nibabel",
     )
@@ -65,9 +65,8 @@ def fastapi_app():
     )
 
     try:
-        import tribev2
-        model = tribev2.TRIBEModel.from_pretrained("facebook/tribe-v2")
-        model.eval()
+        from tribev2 import TribeModel
+        model = TribeModel.from_pretrained("facebook/tribev2")
         print("TRIBE v2 loaded")
     except Exception as e:
         print(f"TRIBE v2 load error: {e}")
