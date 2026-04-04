@@ -1,142 +1,199 @@
-# Human TODOs — Things Claude Can't Do For You
-
-These require a GPU, API keys, or physical access to external services.
-Do these in parallel while Claude builds the backend.
+# Human TODOs — Things That Need You
 
 ---
 
 ## 1. TRIBE v2 Colab Test (BLOCKER — do this first)
 
-**What:** Verify that image → silent video → TRIBE v2 works and produces meaningful predictions.
+**Status: IN PROGRESS**
 
-**Steps:**
-1. Open: https://colab.research.google.com/github/facebookresearch/tribev2/blob/main/tribe_demo.ipynb
-2. Run the setup cells to install TRIBE v2 and its deps
-3. Add a new cell and run this test:
+You're running this now. Here's exactly what to do in the notebook after the setup cells:
+
+**Step 1:** Make sure runtime is T4 GPU — Runtime → Change runtime type → T4 GPU.
+
+**Step 2:** Run all cells up to and including the one that loads the model (looks like `model = ...`).
+
+**Step 3:** Upload two very different test images using the Colab file browser (folder icon on left sidebar → upload). Suggested: a face photo + a landscape photo.
+
+**Step 4:** Add a new cell at the bottom:
 
 ```python
 from moviepy.editor import ImageClip
 from PIL import Image
 import numpy as np
 
-# Convert a JPEG to 1-second silent MP4
-img = Image.open("your_test_image.jpg")
-clip = ImageClip(np.array(img), duration=1)
-clip.write_videofile("/tmp/test.mp4", fps=1, audio=False, verbose=False)
+def img_to_mp4(img_path, out_path):
+    img = Image.open(img_path).convert("RGB")
+    clip = ImageClip(np.array(img), duration=1)
+    clip.write_videofile(out_path, fps=1, audio=False, verbose=False, logger=None)
 
-# Run TRIBE v2 on it
-preds = model.predict(video_path="/tmp/test.mp4")
-print("Shape:", preds.shape)   # should be (1, 20484)
-print("Min:", preds.min(), "Max:", preds.max())
+img_to_mp4("/content/face.jpg", "/tmp/face.mp4")
+img_to_mp4("/content/landscape.jpg", "/tmp/landscape.mp4")
+print("Videos created")
 ```
 
-4. **Quality gate:** Run on two different images (e.g., a face photo vs a landscape photo):
+**Step 5:** Add another new cell:
 
 ```python
-preds_a = model.predict(video_path="/tmp/face.mp4")[0]
-preds_b = model.predict(video_path="/tmp/landscape.mp4")[0]
-correlation = np.corrcoef(preds_a, preds_b)[0, 1]
-print("Correlation:", correlation)
-# If > 0.95: the approach is not working, images look identical to the model
-# If < 0.95: good, proceed with full-stack build
+preds_a = model.predict(video_path="/tmp/face.mp4")
+print("Shape:", preds_a.shape)   # should be (1, 20484)
+
+preds_b = model.predict(video_path="/tmp/landscape.mp4")
+
+a = preds_a[0]
+b = preds_b[0]
+correlation = np.corrcoef(a, b)[0, 1]
+print(f"Correlation: {correlation:.3f}")
+print("PASS" if correlation < 0.95 else "FAIL — images look identical to model")
 ```
 
-**If correlation > 0.95:** Tell Claude. We switch to precomputed-only mode (faster to demo anyway).
+**Tell Claude:** the shape, the correlation number, and any error messages.
+
+- Correlation < 0.95 = live inference works, proceed
+- Correlation > 0.95 = Claude switches to precomputed-only mode (still a great demo)
 
 ---
 
-## 2. Export the Real fsaverage5 Mesh
+## 2. Mesh Export
 
-**What:** Generate `frontend/public/data/mesh.json` with the real ~20k vertex brain mesh.
+**Status: DONE — Claude ran this automatically.**
 
-**Steps:**
-
-```bash
-# In the NeuroDesign repo root
-pip install nilearn nibabel numpy
-python scripts/export_mesh.py
-```
-
-This writes `frontend/public/data/mesh.json` (~15-25 MB).
-The current file is a fake 1000-vertex placeholder — the brain won't look right until you run this.
-
-**If nilearn can't find Destrieux annotation files:** The regionMap will be empty (brains render fine, but hover-to-region won't work). That's acceptable for the demo.
+The real 20,484-vertex brain mesh is at `frontend/public/data/mesh.json` (2.2 MB, 74 Destrieux brain regions).
 
 ---
 
 ## 3. Get API Keys
 
-### Google AI Studio (for Gemma 4)
-1. Go to: https://aistudio.google.com/apikey
-2. Create a key (free, no credit card)
-3. Add to backend `.env`:
-   ```
-   GOOGLE_AI_KEY=your-key-here
-   ```
+### Google AI Studio (Gemma — for plain-English explanations)
 
-### Modal (for GPU inference)
-1. Go to: https://modal.com → sign up (free starter tier)
-2. Run: `pip install modal && modal token new`
-3. Verify Modal pricing for `keep_warm=1` on T4 — see TODOS.md
+1. Go to `aistudio.google.com/apikey`
+2. Click "Create API key" (free, no credit card)
+3. Copy the key — you'll add it to Modal secrets in step 4
+
+### Modal (GPU inference hosting)
+
+1. Go to `modal.com` → sign up (free tier, includes some T4 GPU hours)
+2. In your terminal: `pip install modal && modal token new`
+   - This opens a browser window to authenticate — click "Allow"
+3. Verify you're logged in: `modal profile current`
 
 ---
 
-## 4. Precompute the 4 Showcase Comparisons
+## 4. Set Up Modal Secrets
 
-**What:** Run TRIBE v2 on the 4 image pairs to generate the real precomputed JSONs.
-The current JSONs in `public/data/comparisons/` are fake placeholders.
+The backend needs your Google AI key at runtime. Instead of `.env` files, Modal uses "secrets":
 
-**After the Colab test passes:**
 ```bash
-# In the NeuroDesign repo, after backend is set up:
-python scripts/precompute.py \
-  --imageA images/apple.png --imageB images/cluttered.png \
-  --output frontend/public/data/comparisons/apple-vs-cluttered.json \
-  --name-a "Apple.com" --name-b "Cluttered Site"
+# Create the secret (run once, stores it in Modal's cloud)
+modal secret create neurodesign-secrets GOOGLE_AI_KEY=your-key-here
 ```
 
-You'll need 4 image pairs. Suggested sources:
-- Apple.com vs a cluttered competitor (screenshot both)
-- Portrait photo vs same photo with face removed/blurred
-- Text-heavy slide vs a well-designed infographic
-- A clean landing page vs an AI-slop generated one
+Replace `your-key-here` with the key from step 3. You can verify it's saved at `modal.com/secrets`.
 
 ---
 
-## 5. Set Environment Variables
+## 5. Precompute the 4 Showcase Comparisons
 
-Create `frontend/.env.local`:
+**Do this AFTER the Colab test passes (step 1).**
+
+You need 4 image pairs. Screenshot or download these:
+
+| Pair | Image A | Image B |
+|------|---------|---------|
+| apple-vs-cluttered | Apple.com homepage screenshot | A cluttered competitor homepage |
+| face-vs-noface | Portrait photo with a face | Same photo with face blurred/removed |
+| text-heavy-vs-infographic | Text-heavy slide | Well-designed infographic on same topic |
+| clean-vs-ai-cluttered | Clean landing page | AI-slop generated landing page |
+
+Save them in an `images/` folder in the repo root, then run:
+
+```bash
+# Set up backend deps first (only needed once)
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install moviepy==1.0.3 pillow numpy nilearn nibabel
+
+# Precompute each pair (run from repo root)
+python scripts/precompute.py \
+  --imageA images/apple.png \
+  --imageB images/cluttered.png \
+  --output frontend/public/data/comparisons/apple-vs-cluttered.json \
+  --name-a "Apple.com" --name-b "Cluttered Site"
+
+python scripts/precompute.py \
+  --imageA images/face.jpg \
+  --imageB images/noface.jpg \
+  --output frontend/public/data/comparisons/face-vs-noface.json \
+  --name-a "With Face" --name-b "Without Face"
+
+python scripts/precompute.py \
+  --imageA images/text-slide.png \
+  --imageB images/infographic.png \
+  --output frontend/public/data/comparisons/text-heavy-vs-infographic.json \
+  --name-a "Text Slide" --name-b "Infographic"
+
+python scripts/precompute.py \
+  --imageA images/clean-landing.png \
+  --imageB images/ai-cluttered.png \
+  --output frontend/public/data/comparisons/clean-vs-ai-cluttered.json \
+  --name-a "Clean Design" --name-b "AI Clutter"
+```
+
+Note: `precompute.py` uses TRIBE v2 locally — needs the same GPU or run it in Colab. See the Colab notebook for how to run inference. Alternatively, you can run inference in Colab and manually copy the output JSONs.
+
+---
+
+## 6. Deploy Backend (Modal)
+
+**After steps 3-5 are done:**
+
+```bash
+cd backend
+modal deploy app.py
+```
+
+This will:
+- Build the Docker image with TRIBE v2 installed (~5-10 min first time)
+- Deploy to Modal's cloud with T4 GPU
+- Print the endpoint URL, e.g. `https://rehanmollick--neurodesign-fastapi-app.modal.run`
+
+Copy that URL.
+
+---
+
+## 7. Set Frontend Environment Variable
+
+Create `frontend/.env.local` (never committed to git):
+
 ```
 NEXT_PUBLIC_API_URL=https://your-modal-endpoint.modal.run
 ```
 
-Create `backend/.env`:
-```
-GOOGLE_AI_KEY=your-google-ai-studio-key
-```
+Replace with the URL from step 6.
 
 ---
 
-## 6. Deploy
-
-**After everything is wired up:**
+## 8. Deploy Frontend (Vercel)
 
 ```bash
-# Frontend
-cd frontend && npx vercel --prod
-
-# Backend
-cd backend && modal deploy app.py
+cd frontend
+npx vercel --prod
 ```
 
-Then update `NEXT_PUBLIC_API_URL` in Vercel env vars to point to the Modal endpoint.
+- First time: Vercel will ask you to log in via browser
+- It will ask project name, directory (hit enter for defaults)
+- After deploy, go to `vercel.com` → your project → Settings → Environment Variables
+- Add `NEXT_PUBLIC_API_URL` with the Modal endpoint URL
+- Redeploy once to pick up the env var
 
 ---
 
 ## Priority Order
 
-1. Colab test (tells you if the whole live-inference path is viable)
-2. Mesh export (needed to see a real brain on localhost)
-3. Get API keys (needed before backend deploy)
-4. Precompute 4 image pairs (needed for demo reliability)
-5. Deploy (do this last, Hour 14-16)
+1. **Colab test** — running now (tells you if live inference is viable)
+2. **API keys + Modal setup** — do while Colab runs (steps 3-4)
+3. **Precompute 4 image pairs** — after Colab passes, gives demo real data
+4. **Modal deploy** — step 6, after precompute
+5. **Vercel deploy** — last step, frontend goes live
+
+Mesh export is already done. You only need steps 1, 3, 4, 5, 6, 7, 8.
