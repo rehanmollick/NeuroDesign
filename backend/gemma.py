@@ -66,6 +66,8 @@ Two images were compared using fMRI brain activation prediction. Here are the ke
 
 {region_text}
 
+Remember: more brain activation does NOT mean better design. A cluttered image can activate many regions because the brain is struggling to process visual noise (cognitive overload). A clean image that activates face processing, reward, and focused attention areas is the better design, even with less total activation.
+
 Write 2-3 sentences explaining what this means for the designs. Focus on what the brain differences tell us about how people will perceive these images. Use plain language — no jargon. Be specific and concrete, not vague."""
 
     return _call_gemma(prompt)
@@ -80,6 +82,13 @@ def explain_detailed(regions: list[dict]) -> dict:
 Two images (Image A and Image B) were compared using fMRI brain activation prediction. Here are the differences:
 
 {region_text}
+
+IMPORTANT INTERPRETATION RULES:
+- More total brain activation does NOT mean better design. A cluttered, ugly image can activate many regions because the brain is working overtime to process visual noise. That is cognitive overload, NOT engagement.
+- A clean, well-designed image activates FEWER regions but the RIGHT ones: face processing (fusiform), reward/pleasure (ventral striatum, orbitofrontal), and focused attention (intraparietal). That is good design.
+- High activation in early visual areas (V1, V2) with a messy image = the brain is struggling to parse it. High activation in higher-order areas (fusiform, prefrontal) with a clean image = the brain is engaged and processing meaning.
+- When comparing a clean professional design vs a cluttered one, the clean design almost always wins from a neuromarketing perspective, even if it has less total activation.
+- Judge by QUALITY of activation (which regions), not QUANTITY (how much total).
 
 Respond in EXACTLY this JSON format (no markdown, no code fences, just raw JSON):
 {{
@@ -120,8 +129,17 @@ Here is the comparison data:
 
 Previous analysis: {summary}
 
-IMPORTANT RULES:
-- ALWAYS pick a winner. Never say "neither is objectively better" or "both have merits." The brain data shows clear differences — use them to make a definitive recommendation.
+CRITICAL INTERPRETATION RULES:
+- More total brain activation does NOT mean better. Cluttered, ugly, or visually noisy images activate many brain regions because the brain is working overtime to process the mess. That is cognitive overload, which is BAD.
+- A clean, professional, well-designed image activates fewer regions but the RIGHT ones: face processing, reward centers, and focused attention areas. That is GOOD design.
+- High activation in low-level visual areas (V1, V2, early visual cortex) from a busy image = the brain struggling to parse clutter. Not a win.
+- High activation in higher-order areas (fusiform, prefrontal, reward areas) from a clean image = real engagement and meaning processing. That IS a win.
+- When one image is clearly cleaner/more professional than the other, it almost always wins from a neuromarketing perspective. Do NOT say the cluttered one is better just because it has more raw activation.
+- Judge by QUALITY of activation (which specific regions light up), not QUANTITY (total activation amount).
+
+RESPONSE RULES:
+- ALWAYS pick a winner. Never say "neither is objectively better" or "both have merits."
+- Your answer MUST be consistent with the analysis summary above. If the summary says Image A wins, you say Image A wins.
 - If asked which is better, state the winner clearly in the first sentence, then explain why in 1-2 more sentences.
 - Be specific about what the winning design does better (e.g. "Image A captures attention 34% more effectively because it activates the fusiform face area").
 - Give actionable, concrete advice. Not "consider improving" but "add a human face to increase emotional engagement by ~20%."
