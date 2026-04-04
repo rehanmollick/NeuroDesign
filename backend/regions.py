@@ -97,6 +97,106 @@ REGION_FUNCTIONS = {
         "Anterior Cingulate",
         "Conflict detection and cognitive control",
     ),
+    "S_intrapariet_and_P_trans": (
+        "Intraparietal Sulcus",
+        "Directs spatial attention and tracks where objects are",
+    ),
+    "S_postcentral": (
+        "Postcentral Sulcus",
+        "Processes touch and body awareness signals",
+    ),
+    "S_oc_sup_and_transversal": (
+        "Superior Occipital Sulcus",
+        "Connects visual areas for depth and motion processing",
+    ),
+    "S_occipital_ant": (
+        "Anterior Occipital Sulcus",
+        "Bridges early vision with higher-level object recognition",
+    ),
+    "S_oc_middle_and_Lunatus": (
+        "Middle Occipital Sulcus",
+        "Processes visual contours and shape boundaries",
+    ),
+    "S_oc-temp_med_and_Lingual": (
+        "Occipitotemporal Sulcus",
+        "Connects visual processing to word and face recognition",
+    ),
+    "S_parieto_occipital": (
+        "Parieto-Occipital Sulcus",
+        "Integrates vision with spatial awareness and navigation",
+    ),
+    "S_collat_transv_ant": (
+        "Anterior Collateral Sulcus",
+        "Supports face and scene recognition memory",
+    ),
+    "S_collat_transv_post": (
+        "Posterior Collateral Sulcus",
+        "Processes visual scenes and spatial layout",
+    ),
+    "S_front_middle": (
+        "Middle Frontal Sulcus",
+        "Executive planning and sustained attention",
+    ),
+    "S_circular_insula_sup": (
+        "Superior Circular Insular Sulcus",
+        "Emotional awareness and sensory integration",
+    ),
+    "S_interm_prim-Jensen": (
+        "Intermediate Sulcus",
+        "Links auditory and visual processing areas",
+    ),
+    "S_orbital_lateral": (
+        "Lateral Orbital Sulcus",
+        "Evaluates reward value and emotional significance",
+    ),
+    "S_precentral-sup-part": (
+        "Superior Precentral Sulcus",
+        "Plans eye movements and visual search",
+    ),
+    "G_precentral": (
+        "Precentral Gyrus",
+        "Motor planning, responds to action-oriented imagery",
+    ),
+    "G_and_S_paracentral": (
+        "Paracentral Lobule",
+        "Motor and sensory processing for lower body",
+    ),
+    "G_and_S_subcentral": (
+        "Subcentral Gyrus",
+        "Taste and mouth sensation, responds to food imagery",
+    ),
+    "G_front_inf-Opercular": (
+        "Inferior Frontal Operculum",
+        "Language production and interpreting visual meaning",
+    ),
+    "G_temp_sup-Plan_polar": (
+        "Temporal Polar Planum",
+        "Processes familiar voices and emotional tone",
+    ),
+    "G_Ins_lg_and_S_cent_ins": (
+        "Long Insular Gyrus",
+        "Pain processing and emotional intensity",
+    ),
+    "G_and_S_occipital_inf": (
+        "Inferior Occipital Gyrus",
+        "Early visual processing of objects and faces",
+    ),
+    "Pole_occipital": (
+        "Occipital Pole",
+        "Sharpest central vision processing, what you look at directly",
+    ),
+    "Pole_temporal": (
+        "Temporal Pole",
+        "Links emotions to memories and familiar concepts",
+    ),
+    "Lat_Fis-ant-Horizont": (
+        "Anterior Horizontal Fissure",
+        "Separates frontal and temporal language areas",
+    ),
+    "Lat_Fis-ant-Vertical": (
+        "Anterior Vertical Fissure",
+        "Boundary between motor and language regions",
+    ),
 }
 
 
