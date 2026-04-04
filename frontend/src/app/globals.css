@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-hover: #1a1a28;
+  --border: #1e1e2e;
+  --text-primary: #e8e6e3;
+  --text-secondary: #8a8a9a;
+  --accent: #00e5a0;
+  --accent-secondary: #00b4d8;
+  --danger: #ff6b6b;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Scanning progress bar animation */
+@keyframes scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(40%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* Hide scrollbar for preset tabs */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Page load fade-in animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 400ms ease-out both;
+}
+
+.fade-up-1 { animation-delay: 0ms; }
+.fade-up-2 { animation-delay: 50ms; }
+.fade-up-3 { animation-delay: 100ms; }
+.fade-up-4 { animation-delay: 150ms; }
+.fade-up-5 { animation-delay: 200ms; }
+.fade-up-6 { animation-delay: 250ms; }
+
+/* Brain entrance animation */
+@keyframes brainEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.brain-entrance {
+  animation: brainEntrance 400ms ease-out both;
+}
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+  .upload-row {
+    flex-direction: column !important;
+  }
+
+  .brain-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-main {
+    padding: 20px !important;
+  }
+
+  .page-title {
+    font-size: 32px !important;
+  }
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 16px;
+  top: 16px;
+}
