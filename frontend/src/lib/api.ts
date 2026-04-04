@@ -18,6 +18,21 @@ export async function loadPreset(presetId: string): Promise<ComparisonResult> {
   return res.json()
 }
 
+async function fetchCompare(formData: FormData, timeoutMs: number): Promise<ComparisonResult> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const res = await fetch(
+      process.env.NEXT_PUBLIC_API_URL + "/compare",
+      { method: "POST", body: formData, signal: controller.signal }
+    )
+    if (!res.ok) throw new Error(`API error: ${res.status}`)
+    return res.json()
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
 export async function compareImages(
   imageA: File,
   imageB: File
@@ -26,26 +41,17 @@ export async function compareImages(
   formData.append("imageA", imageA)
   formData.append("imageB", imageB)
 
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), API_TIMEOUT)
-
   try {
-    const res = await fetch(
-      process.env.NEXT_PUBLIC_API_URL + "/compare",
-      {
-        method: "POST",
-        body: formData,
-        signal: controller.signal,
-      }
-    )
-
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status}`)
+    return await fetchCompare(formData, API_TIMEOUT)
+  } catch (err) {
+    // Auto-retry once on timeout (cold start)
+    if (err instanceof DOMException && err.name === "AbortError") {
+      const retryData = new FormData()
+      retryData.append("imageA", imageA)
+      retryData.append("imageB", imageB)
+      return await fetchCompare(retryData, API_TIMEOUT)
     }
-
-    return res.json()
-  } finally {
-    clearTimeout(timeout)
+    throw err
   }
 }
 
