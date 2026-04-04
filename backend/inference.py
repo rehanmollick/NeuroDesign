@@ -13,7 +13,14 @@ def image_to_video(img: Image.Image, output_path: str) -> None:
     """Convert a PIL image to a 1-second silent MP4 via moviepy."""
     from moviepy.editor import ImageClip
 
-    arr = np.array(img.convert("RGB"))
+    # Resize to max 512px on longest side — TRIBE v2 doesn't need full-res
+    img = img.convert("RGB")
+    w, h = img.size
+    if max(w, h) > 512:
+        scale = 512 / max(w, h)
+        img = img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+
+    arr = np.array(img)
     clip = ImageClip(arr, duration=1)
     clip.write_videofile(
         output_path,
