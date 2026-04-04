@@ -254,25 +254,46 @@ export default function Home() {
         id="results"
         className="brain-grid grid gap-8 fade-up fade-up-4"
         style={{
-          gridTemplateColumns: "1fr 1fr",
           opacity: isScanning ? 0.4 : 1,
           transition: "opacity 200ms ease-out",
+          gridTemplateColumns: "1fr 1fr",
         }}
       >
-        <BrainViewer
-          meshData={meshData}
-          activations={comparison?.activations.imageA ?? null}
-          label={comparison?.imageA.name ?? "Image A"}
-          isLoading={isScanning}
-          onRegionClick={(r) => setSelectedRegion(r)}
-        />
-        <BrainViewer
-          meshData={meshData}
-          activations={comparison?.activations.imageB ?? null}
-          label={comparison?.imageB.name ?? "Image B"}
-          isLoading={isScanning}
-          onRegionClick={(r) => setSelectedRegion(r)}
-        />
+        {/* Brain A */}
+        <div className="flex flex-col gap-3">
+          {comparison?.imageA.url && (
+            <img
+              src={comparison.imageA.url}
+              alt={comparison.imageA.name}
+              style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", borderRadius: "4px", border: "1px solid #1e1e2e" }}
+            />
+          )}
+          <BrainViewer
+            meshData={meshData}
+            activations={comparison?.activations.imageA ?? null}
+            label={comparison?.imageA.name ?? "Image A"}
+            isLoading={isScanning}
+            onRegionClick={(r) => setSelectedRegion(r)}
+          />
+        </div>
+
+        {/* Brain B */}
+        <div className="flex flex-col gap-3">
+          {comparison?.imageB.url && (
+            <img
+              src={comparison.imageB.url}
+              alt={comparison.imageB.name}
+              style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", borderRadius: "4px", border: "1px solid #1e1e2e" }}
+            />
+          )}
+          <BrainViewer
+            meshData={meshData}
+            activations={comparison?.activations.imageB ?? null}
+            label={comparison?.imageB.name ?? "Image B"}
+            isLoading={isScanning}
+            onRegionClick={(r) => setSelectedRegion(r)}
+          />
+        </div>
       </div>
 
       {/* Results: bars + explanation */}

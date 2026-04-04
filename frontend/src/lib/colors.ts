@@ -10,17 +10,8 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t
 }
 
-export function activationToRGB(
-  value: number
-): { r: number; g: number; b: number } {
-  if (isNaN(value) || value === null || value === undefined) {
-    return DEFAULT
-  }
-
-  const v = Math.max(0, Math.min(1, value))
-
+function mapColor(v: number): { r: number; g: number; b: number } {
   if (v < 0.5) {
-    // cold to mid
     const t = v * 2
     return {
       r: lerp(COLD.r, MID.r, t),
@@ -28,7 +19,6 @@ export function activationToRGB(
       b: lerp(COLD.b, MID.b, t),
     }
   } else {
-    // mid to hot
     const t = (v - 0.5) * 2
     return {
       r: lerp(MID.r, HOT.r, t),
@@ -36,6 +26,18 @@ export function activationToRGB(
       b: lerp(MID.b, HOT.b, t),
     }
   }
+}
+
+export function activationToRGB(
+  value: number,
+  min = 0,
+  max = 1,
+): { r: number; g: number; b: number } {
+  if (value === null || value === undefined || isNaN(value)) return DEFAULT
+  // Contrast-stretch: map [min, max] -> [0, 1] so the full color range is used
+  const range = max - min
+  const v = range < 1e-6 ? 0.5 : Math.max(0, Math.min(1, (value - min) / range))
+  return mapColor(v)
 }
 
 // CSS color string for UI elements

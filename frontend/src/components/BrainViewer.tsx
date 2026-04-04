@@ -111,9 +111,21 @@ function BrainMesh({ meshData, activations, onRegionClick, isLoading }: BrainMes
   useEffect(() => {
     const colorAttr = geometry.getAttribute("color") as THREE.BufferAttribute
     const colors = colorAttr.array as Float32Array
+
+    // Contrast-stretch per brain: use the 5th/95th percentile as min/max
+    // so outliers don't wash out the color range
+    let min = 0, max = 1
+    if (activations && activations.length > 0) {
+      const sorted = [...activations].sort((a, b) => a - b)
+      const p5 = Math.floor(sorted.length * 0.05)
+      const p95 = Math.floor(sorted.length * 0.95)
+      min = sorted[p5]
+      max = sorted[p95]
+    }
+
     for (let i = 0; i < meshData.vertices.length; i++) {
       const val = activations ? activations[i] : NaN
-      const { r, g, b } = activationToRGB(val)
+      const { r, g, b } = activationToRGB(val, min, max)
       colors[i * 3] = r
       colors[i * 3 + 1] = g
       colors[i * 3 + 2] = b
