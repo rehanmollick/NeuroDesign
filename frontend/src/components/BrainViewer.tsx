@@ -5,7 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls, Html } from "@react-three/drei"
 import * as THREE from "three"
 import { MeshData } from "@/lib/types"
-import { activationToRGB } from "@/lib/colors"
+import { activationToRGB, diffToRGB } from "@/lib/colors"
 
 // Region function lookup (display names from regions.py)
 const REGION_DISPLAY: Record<string, [string, string]> = {
@@ -70,11 +70,12 @@ function RegionTooltip({ name, fn }: { name: string; fn: string }) {
 interface BrainMeshProps {
   meshData: MeshData
   activations: number[] | null
+  activationsB?: number[] | null  // if provided, show diff (B - A)
   onRegionClick?: (region: string) => void
   isLoading?: boolean
 }
 
-function BrainMesh({ meshData, activations, onRegionClick, isLoading }: BrainMeshProps) {
+function BrainMesh({ meshData, activations, activationsB, onRegionClick, isLoading }: BrainMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null)
   const [tooltipPos, setTooltipPos] = useState<THREE.Vector3 | null>(null)
@@ -112,26 +113,36 @@ function BrainMesh({ meshData, activations, onRegionClick, isLoading }: BrainMes
     const colorAttr = geometry.getAttribute("color") as THREE.BufferAttribute
     const colors = colorAttr.array as Float32Array
 
-    // Contrast-stretch: 10th/90th percentile + gamma boost for vivid differences
-    let min = 0, max = 1
-    if (activations && activations.length > 0) {
-      const sorted = [...activations].sort((a, b) => a - b)
-      const p10 = Math.floor(sorted.length * 0.10)
-      const p90 = Math.floor(sorted.length * 0.90)
-      min = sorted[p10]
-      max = sorted[p90]
-    }
+    const isDiff = activationsB != null && activations != null
 
-    for (let i = 0; i < meshData.vertices.length; i++) {
-      const val = activations ? activations[i] : NaN
-      // Gamma < 1 pushes mid-values toward the hot end, making differences pop
-      const { r, g, b } = activationToRGB(val, min, max, 0.6)
-      colors[i * 3] = r
-      colors[i * 3 + 1] = g
-      colors[i * 3 + 2] = b
+    if (isDiff) {
+      // Diff mode: color = B - A, blue means A wins, red means B wins
+      const deltas = activations!.map((a, i) => activationsB![i] - a)
+      const absMax = Math.max(...deltas.map(Math.abs)) || 1
+      for (let i = 0; i < meshData.vertices.length; i++) {
+        const { r, g, b } = diffToRGB(deltas[i], absMax)
+        colors[i * 3] = r
+        colors[i * 3 + 1] = g
+        colors[i * 3 + 2] = b
+      }
+    } else {
+      // Absolute mode: vivid rainbow, 10th-90th percentile stretch
+      let min = 0, max = 1
+      if (activations && activations.length > 0) {
+        const sorted = [...activations].sort((a, b) => a - b)
+        min = sorted[Math.floor(sorted.length * 0.10)]
+        max = sorted[Math.floor(sorted.length * 0.90)]
+      }
+      for (let i = 0; i < meshData.vertices.length; i++) {
+        const val = activations ? activations[i] : NaN
+        const { r, g, b } = activationToRGB(val, min, max, 0.55)
+        colors[i * 3] = r
+        colors[i * 3 + 1] = g
+        colors[i * 3 + 2] = b
+      }
     }
     colorAttr.needsUpdate = true
-  }, [activations, geometry, meshData.vertices.length])
+  }, [activations, activationsB, geometry, meshData.vertices.length])
 
   useFrame((state) => {
     if (isLoading && meshRef.current) {
@@ -242,6 +253,7 @@ function ParticleDust() {
 interface BrainViewerProps {
   meshData: MeshData | null
   activations: number[] | null
+  activationsB?: number[] | null
   label: string
   isLoading?: boolean
   onRegionClick?: (region: string) => void
@@ -251,6 +263,7 @@ interface BrainViewerProps {
 export default function BrainViewer({
   meshData,
   activations,
+  activationsB,
   label,
   isLoading,
   onRegionClick,
@@ -293,6 +306,7 @@ export default function BrainViewer({
           <BrainMesh
             meshData={meshData}
             activations={activations}
+            activationsB={activationsB}
             onRegionClick={onRegionClick}
             isLoading={isLoading}
           />

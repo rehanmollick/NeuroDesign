@@ -304,18 +304,40 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Color legend */}
+      {/* Color legends + diff brain */}
       {comparison && (
-        <div className="flex items-center gap-3 mt-2 fade-up fade-up-4" style={{ justifyContent: "center" }}>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#8a8a9a" }}>LOW</span>
-          <div style={{
-            width: "180px", height: "8px", borderRadius: "4px",
-            background: "linear-gradient(to right, #1a3a5c, #ff8c00, #ff4d4d)",
-          }} />
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#8a8a9a" }}>HIGH</span>
-          <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#8a8a9a", marginLeft: "8px" }}>
-            brain activation — colors are per-brain, not comparable across the two
-          </span>
+        <div className="fade-up fade-up-4 mt-2">
+          {/* Legends row */}
+          <div className="flex gap-8 justify-center mb-6" style={{ flexWrap: "wrap" }}>
+            <div className="flex items-center gap-2">
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#8a8a9a" }}>LOW</span>
+              <div style={{ width: "120px", height: "7px", borderRadius: "4px", background: "linear-gradient(to right, #080840, #0060ff, #00e5a0, #ffe000, #ff6000, #ff0000)" }} />
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#8a8a9a" }}>HIGH</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#4a4a5a", marginLeft: "4px" }}>activation</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#0060ff" }}>■</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#8a8a9a" }}>A activates more</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#ff0000", marginLeft: "8px" }}>■</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#8a8a9a" }}>B activates more</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#4a4a5a", marginLeft: "4px" }}>(difference brain)</span>
+            </div>
+          </div>
+
+          {/* Diff brain — centered, smaller */}
+          <div style={{ maxWidth: "300px", margin: "0 auto" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#8a8a9a", textAlign: "center", marginBottom: "4px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              B − A difference
+            </div>
+            <BrainViewer
+              meshData={meshData}
+              activations={comparison.activations.imageA}
+              activationsB={comparison.activations.imageB}
+              label=""
+              isLoading={isScanning}
+              resetKey={(comparison.imageA.name ?? "") + "-diff"}
+            />
+          </div>
         </div>
       )}
 
