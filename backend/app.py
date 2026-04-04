@@ -3,19 +3,12 @@ NeuroDesign backend — FastAPI on Modal with T4 GPU.
 POST /compare: accepts two images, returns ComparisonResult JSON.
 """
 
-import os
-import io
-import sys
-import json
-import numpy as np
-from pathlib import Path
-
 import modal
 
-# Modal image with all deps
+# Modal image with all deps + local source files baked in
 image = (
     modal.Image.debian_slim(python_version="3.11")
-    .apt_install("ffmpeg", "libglib2.0-0", "libsm6", "libxext6", "libxrender-dev")
+    .apt_install("ffmpeg", "git", "libglib2.0-0", "libsm6", "libxext6", "libxrender-dev")
     .pip_install(
         "fastapi[standard]",
         "python-multipart",
@@ -28,38 +21,33 @@ image = (
     .run_commands(
         "pip install git+https://github.com/facebookresearch/tribev2.git"
     )
+    # Bake backend source files into image at /app
+    .add_local_file("inference.py", "/app/inference.py")
+    .add_local_file("regions.py", "/app/regions.py")
+    .add_local_file("gemma.py", "/app/gemma.py")
+    # Bake mesh.json (needed for region map)
+    .add_local_file("../frontend/public/data/mesh.json", "/data/mesh.json")
 )
 
 app = modal.App("neurodesign", image=image)
 
-# Mount backend source files into the container at /app
-# and mesh.json at /data/mesh.json
-backend_mount = modal.Mount.from_local_dir(
-    local_path=".",
-    remote_path="/app",
-    condition=lambda p: p.endswith(".py"),
-)
-
-mesh_mount = modal.Mount.from_local_file(
-    local_path="../frontend/public/data/mesh.json",
-    remote_path="/data/mesh.json",
-)
-
 
 @app.function(
     gpu="T4",
-    keep_warm=1,  # keep one container warm — verify Modal pricing before deploy
+    min_containers=1,
     timeout=120,
     secrets=[modal.Secret.from_name("neurodesign-secrets")],
-    mounts=[backend_mount, mesh_mount],
 )
 @modal.asgi_app()
 def fastapi_app():
+    import os
+    import io
+    import sys
+    import numpy as np
     from fastapi import FastAPI, UploadFile, File, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
     from PIL import Image
 
-    # Make /app importable
     if "/app" not in sys.path:
         sys.path.insert(0, "/app")
 
@@ -76,7 +64,6 @@ def fastapi_app():
         allow_headers=["*"],
     )
 
-    # Load model and region map once at container startup
     try:
         import tribev2
         model = tribev2.TRIBEModel.from_pretrained("facebook/tribe-v2")
@@ -115,10 +102,8 @@ def fastapi_app():
             raise HTTPException(status_code=500, detail="Inference failed")
 
         norm_a, norm_b = normalize_joint(raw_a, raw_b)
-
         activations = np.stack([norm_a, norm_b], axis=0)
         regions = aggregate_regions(activations, region_map)
-
         summary = explain(regions)
 
         return {
