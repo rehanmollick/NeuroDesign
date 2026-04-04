@@ -27,15 +27,15 @@ body {
 
 /* Scanning progress bar animation */
 @keyframes scan {
-  0% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(40%);
-  }
-  100% {
-    transform: translateX(200%);
-  }
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(40%); }
+  100% { transform: translateX(200%); }
+}
+
+/* Scanning sweep across brains */
+@keyframes scanSweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
 }
 
 /* Hide scrollbar for preset tabs */
@@ -89,19 +89,15 @@ body {
 /* Mobile responsive */
 @media (max-width: 767px) {
   .upload-row {
-    flex-direction: column !important;
+    flex-wrap: wrap !important;
   }
 
   .brain-grid {
     grid-template-columns: 1fr !important;
   }
 
-  .page-main {
+  #demo {
     padding: 20px !important;
-  }
-
-  .page-title {
-    font-size: 32px !important;
   }
 }
 

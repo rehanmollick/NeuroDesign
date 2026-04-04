@@ -6,13 +6,14 @@ interface UploadZoneProps {
   label: string
   file: File | null
   onFileSelect: (file: File | null) => void
+  compact?: boolean
 }
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"]
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 const MIN_DIM = 200
 
-export default function UploadZone({ label, file, onFileSelect }: UploadZoneProps) {
+export default function UploadZone({ label, file, onFileSelect, compact }: UploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
@@ -83,7 +84,7 @@ export default function UploadZone({ label, file, onFileSelect }: UploadZoneProp
           style={{
             border: "1px solid #1e1e2e",
             borderRadius: "4px",
-            height: "100px",
+            height: compact ? "52px" : "100px",
           }}
         >
           <img
@@ -122,12 +123,13 @@ export default function UploadZone({ label, file, onFileSelect }: UploadZoneProp
           border: `1px solid ${isDragging ? "#00e5a0" : "#1e1e2e"}`,
           borderRadius: "4px",
           background: isDragging ? "#0f1f18" : "transparent",
-          height: "100px",
+          height: compact ? "52px" : "100px",
           display: "flex",
-          flexDirection: "column",
+          flexDirection: compact ? "row" : "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: "8px",
+          gap: compact ? "6px" : "8px",
+          padding: compact ? "0 12px" : undefined,
         }}
         onDragOver={(e) => {
           e.preventDefault()
