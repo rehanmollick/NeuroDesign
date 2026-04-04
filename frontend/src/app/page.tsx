@@ -141,7 +141,7 @@ export default function Home() {
     } catch (err) {
       setScanning(false)
       if (err instanceof DOMException && err.name === "AbortError") {
-        setError("Request timed out after retrying. The GPU server may be under heavy load, try again in a minute.")
+        setError("Request timed out. The GPU server may be cold, wait 30s and try again.")
       } else {
         setError("Analysis failed. Try a different image or explore a preset comparison.")
       }
