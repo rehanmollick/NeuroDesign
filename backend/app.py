@@ -43,10 +43,14 @@ def fastapi_app():
     import os
     import io
     import sys
+    import asyncio
     import numpy as np
+    from concurrent.futures import ThreadPoolExecutor
     from fastapi import FastAPI, UploadFile, File, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
     from PIL import Image
+
+    executor = ThreadPoolExecutor(max_workers=4)
 
     if "/app" not in sys.path:
         sys.path.insert(0, "/app")
@@ -103,8 +107,12 @@ def fastapi_app():
         norm_a, norm_b = normalize_joint(raw_a, raw_b)
         activations = np.stack([norm_a, norm_b], axis=0)
         regions = aggregate_regions(activations, region_map)
-        summary = explain(regions)
-        detailed = explain_detailed(regions)
+
+        # Run both Gemma calls in parallel
+        loop = asyncio.get_event_loop()
+        summary_fut = loop.run_in_executor(executor, explain, regions)
+        detailed_fut = loop.run_in_executor(executor, explain_detailed, regions)
+        summary, detailed = await asyncio.gather(summary_fut, detailed_fut)
 
         return {
             "imageA": {"url": "", "name": imageA.filename or "Image A"},
