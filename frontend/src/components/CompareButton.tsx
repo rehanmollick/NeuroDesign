@@ -12,8 +12,12 @@ interface CompareButtonProps {
 // Staged status text for long inference waits
 const STAGES = [
   { text: "UPLOADING...", after: 0 },
-  { text: "RUNNING INFERENCE...", after: 3000 },
-  { text: "GENERATING ANALYSIS...", after: 25000 },
+  { text: "PREDICTING BRAIN ACTIVITY...", after: 3000 },
+  { text: "SCANNING IMAGE A...", after: 15000 },
+  { text: "SCANNING IMAGE B...", after: 45000 },
+  { text: "MAPPING BRAIN REGIONS...", after: 75000 },
+  { text: "GENERATING AI ANALYSIS...", after: 100000 },
+  { text: "ALMOST DONE...", after: 130000 },
 ]
 
 export default function CompareButton({

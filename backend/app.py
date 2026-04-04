@@ -35,7 +35,7 @@ app = modal.App("neurodesign", image=image)
 @app.function(
     gpu="T4",
     min_containers=1,
-    timeout=120,
+    timeout=300,
     secrets=[modal.Secret.from_name("neurodesign-secrets")],
 )
 @modal.asgi_app()
