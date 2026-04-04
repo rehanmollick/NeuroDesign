@@ -5,6 +5,7 @@ Generates plain-English explanation of brain activation differences.
 
 import os
 import json
+import urllib.error
 
 
 def explain(regions: list[dict]) -> str:
@@ -40,10 +41,9 @@ Write 2-3 sentences explaining what this means for the designs. Focus on what th
     try:
         import urllib.request
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent?key={api_key}"
         body = json.dumps({
             "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"maxOutputTokens": 200, "temperature": 0.7},
         }).encode()
 
         req = urllib.request.Request(
@@ -53,10 +53,17 @@ Write 2-3 sentences explaining what this means for the designs. Focus on what th
             method="POST",
         )
 
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.load(resp)
-            return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            # Gemma 4 returns "thought" parts before the actual response — skip them
+            parts = data["candidates"][0]["content"]["parts"]
+            text = next((p["text"] for p in parts if not p.get("thought")), "")
+            return text.strip()
 
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="replace")[:300]
+        print(f"Gemma HTTP error {e.code}: {body}")
+        return ""
     except Exception as e:
         print(f"Gemma error: {e}")
         return ""
