@@ -29,7 +29,7 @@ def _call_gemma(prompt: str) -> str:
             method="POST",
         )
 
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.load(resp)
             parts = data["candidates"][0]["content"]["parts"]
             text = next((p["text"] for p in parts if not p.get("thought")), "")
@@ -102,20 +102,27 @@ Respond in EXACTLY this JSON format (no markdown, no code fences, just raw JSON)
 
 Use plain language. Be specific about what each image does to the brain. No jargon."""
 
-    text = _call_gemma(prompt)
-    if not text:
-        return {}
+    required = ["winner", "winner_reason", "emotional_impact", "visual_attention", "memory_retention"]
 
-    try:
-        # Strip markdown fences if present
-        text = text.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1]
-            text = text.rsplit("```", 1)[0]
-        return json.loads(text)
-    except json.JSONDecodeError:
-        print(f"Gemma JSON parse error: {text[:200]}")
-        return {}
+    for attempt in range(2):
+        text = _call_gemma(prompt)
+        if not text:
+            continue
+
+        try:
+            clean = text.strip()
+            if clean.startswith("```"):
+                clean = clean.split("\n", 1)[1]
+                clean = clean.rsplit("```", 1)[0]
+            result = json.loads(clean)
+            # Check all required fields are present and non-empty
+            if all(result.get(k) for k in required):
+                return result
+            print(f"Gemma returned incomplete JSON (attempt {attempt+1}): missing {[k for k in required if not result.get(k)]}")
+        except json.JSONDecodeError:
+            print(f"Gemma JSON parse error (attempt {attempt+1}): {text[:200]}")
+
+    return {}
 
 
 def chat(regions: list[dict], summary: str, user_message: str, history: list[dict] = None) -> str:
