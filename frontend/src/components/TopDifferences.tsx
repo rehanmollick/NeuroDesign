@@ -123,9 +123,18 @@ export default function TopDifferences({ regions }: TopDifferencesProps) {
                 fontSize: "12px",
                 color: "#e8e6e3",
                 lineHeight: 1.3,
-                marginBottom: "4px",
+                marginBottom: "2px",
               }}>
                 {region.displayName}
+              </div>
+              <div style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "10px",
+                color: "#8a8a9a",
+                lineHeight: 1.3,
+                marginBottom: "4px",
+              }}>
+                {region.function}
               </div>
               <div style={{
                 fontFamily: "var(--font-mono)",
