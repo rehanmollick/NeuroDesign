@@ -53,7 +53,7 @@ def fastapi_app():
 
     from inference import predict, normalize_joint
     from regions import load_region_map, aggregate_regions
-    from gemma import explain
+    from gemma import explain, explain_detailed, chat as gemma_chat
 
     api = FastAPI()
 
@@ -104,6 +104,7 @@ def fastapi_app():
         activations = np.stack([norm_a, norm_b], axis=0)
         regions = aggregate_regions(activations, region_map)
         summary = explain(regions)
+        detailed = explain_detailed(regions)
 
         return {
             "imageA": {"url": "", "name": imageA.filename or "Image A"},
@@ -114,7 +115,24 @@ def fastapi_app():
             },
             "regions": regions,
             "summary": summary,
+            "detailed": detailed,
         }
+
+    @api.post("/chat")
+    async def chat_endpoint(body: dict):
+        regions = body.get("regions", [])
+        summary = body.get("summary", "")
+        message = body.get("message", "")
+        history = body.get("history", [])
+
+        if not message:
+            raise HTTPException(status_code=400, detail="Message required")
+
+        response = gemma_chat(regions, summary, message, history)
+        if not response:
+            raise HTTPException(status_code=503, detail="Chat unavailable")
+
+        return {"response": response}
 
     @api.get("/health")
     async def health():

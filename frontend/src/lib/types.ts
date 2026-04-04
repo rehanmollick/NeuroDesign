@@ -20,6 +20,19 @@ export interface ComparisonResult {
     delta: number // B - A
   }>
   summary: string // Gemma explanation (empty for precomputed-only)
+  detailed?: {
+    winner?: string
+    winner_reason?: string
+    emotional_impact?: string
+    visual_attention?: string
+    memory_retention?: string
+    recommendations?: string[]
+  }
+}
+
+export interface ChatMessage {
+  role: "user" | "assistant"
+  content: string
 }
 
 export interface PresetComparison {

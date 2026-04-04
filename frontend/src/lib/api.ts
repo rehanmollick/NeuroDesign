@@ -1,4 +1,4 @@
-import { ComparisonResult, PresetComparison } from "./types"
+import { ComparisonResult, PresetComparison, ChatMessage } from "./types"
 
 const API_TIMEOUT = 110000 // 110s — Modal T4 cold start + inference can take 90s
 
@@ -44,6 +44,34 @@ export async function compareImages(
     }
 
     return res.json()
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+export async function chatWithAdvisor(
+  message: string,
+  regions: ComparisonResult["regions"],
+  summary: string,
+  history: ChatMessage[]
+): Promise<string> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30000)
+
+  try {
+    const res = await fetch(
+      process.env.NEXT_PUBLIC_API_URL + "/chat",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, regions, summary, history }),
+        signal: controller.signal,
+      }
+    )
+
+    if (!res.ok) throw new Error(`Chat error: ${res.status}`)
+    const data = await res.json()
+    return data.response
   } finally {
     clearTimeout(timeout)
   }

@@ -25,80 +25,29 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-/* Scanning progress bar animation */
-@keyframes scan {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(40%); }
-  100% { transform: translateX(200%); }
-}
-
 /* Scanning sweep across brains */
 @keyframes scanSweep {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(400%); }
 }
 
+/* Scroll indicator pulse */
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
 /* Hide scrollbar for preset tabs */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Page load fade-in animation */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-up {
-  animation: fadeUp 400ms ease-out both;
-}
-
-.fade-up-1 { animation-delay: 0ms; }
-.fade-up-2 { animation-delay: 50ms; }
-.fade-up-3 { animation-delay: 100ms; }
-.fade-up-4 { animation-delay: 150ms; }
-.fade-up-5 { animation-delay: 200ms; }
-.fade-up-6 { animation-delay: 250ms; }
-
-/* Brain entrance animation */
+/* Brain entrance */
 @keyframes brainEntrance {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
-
 .brain-entrance {
   animation: brainEntrance 400ms ease-out both;
-}
-
-/* Mobile responsive */
-@media (max-width: 767px) {
-  .upload-row {
-    flex-wrap: wrap !important;
-  }
-
-  .brain-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  #demo {
-    padding: 20px !important;
-  }
 }
 
 /* Skip link */
@@ -114,8 +63,32 @@ body {
   font-size: 12px;
   text-decoration: none;
 }
-
 .skip-link:focus {
   left: 16px;
   top: 16px;
+}
+
+/* Subtle grid texture on sections */
+#tool {
+  background-image:
+    linear-gradient(rgba(30, 30, 46, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 30, 46, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Glow effect for accent elements */
+.glow-green {
+  box-shadow: 0 0 16px rgba(0, 229, 160, 0.15);
+}
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+  .brain-grid,
+  #tool > div > div:nth-child(2) {
+    grid-template-columns: 1fr !important;
+  }
+
+  #demo, #tool {
+    padding: 20px !important;
+  }
 }

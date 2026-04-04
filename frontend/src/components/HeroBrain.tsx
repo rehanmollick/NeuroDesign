@@ -94,7 +94,12 @@ function SynapsingBrain({ meshData }: { meshData: MeshData }) {
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
-      <meshStandardMaterial vertexColors metalness={0.3} roughness={0.7} />
+      <meshStandardMaterial
+        vertexColors
+        metalness={0.55}
+        roughness={0.35}
+        envMapIntensity={0.8}
+      />
     </mesh>
   )
 }
@@ -156,9 +161,10 @@ export default function HeroBrain({ meshData }: HeroBrainProps) {
       style={{ background: "transparent", width: "100%", height: "100%" }}
       aria-label="Interactive 3D brain with synapse pulse animation"
     >
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[5, 5, 5]} intensity={0.8} />
-      <directionalLight position={[-3, -2, 4]} intensity={0.2} />
+      <ambientLight intensity={0.2} />
+      <directionalLight position={[5, 5, 5]} intensity={1.0} color="#ffffff" />
+      <directionalLight position={[-4, -2, 3]} intensity={0.4} color="#00e5a0" />
+      <directionalLight position={[0, -5, -3]} intensity={0.15} color="#00b4d8" />
       <SynapsingBrain meshData={meshData} />
       <HeroParticles />
       <OrbitControls

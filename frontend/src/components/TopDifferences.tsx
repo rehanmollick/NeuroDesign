@@ -7,104 +7,135 @@ interface TopDifferencesProps {
 }
 
 export default function TopDifferences({ regions }: TopDifferencesProps) {
-  // Sort by absolute delta, take top 8
   const sorted = [...regions]
     .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
-    .slice(0, 8)
+    .slice(0, 6)
+
+  const maxVal = Math.max(...sorted.map((r) => Math.max(r.activationA, r.activationB)))
 
   return (
     <div>
-      <h3
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "12px",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#8a8a9a",
-          marginBottom: "16px",
-        }}
-      >
-        TOP DIFFERENCES
+      <h3 style={{
+        fontFamily: "var(--font-mono)",
+        fontSize: "11px",
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        color: "#8a8a9a",
+        marginBottom: "24px",
+      }}>
+        Brain Region Comparison
       </h3>
 
-      <div className="flex flex-col gap-3">
-        {sorted.map((region) => (
-          <div key={region.name}>
-            <div
-              className="flex justify-between items-center mb-1"
-              style={{ fontSize: "13px" }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  color: "#e8e6e3",
-                  fontSize: "12px",
-                }}
-              >
-                {region.displayName}
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  color: region.delta > 0 ? "#00b4d8" : "#00e5a0",
-                  fontSize: "12px",
-                }}
-              >
-                {region.delta > 0 ? "+" : ""}
-                {(region.delta * 100).toFixed(0)}%
-              </span>
-            </div>
+      {/* Vertical bar chart */}
+      <div style={{
+        display: "flex",
+        gap: "8px",
+        alignItems: "flex-end",
+        height: "180px",
+        padding: "0 4px",
+        borderBottom: "1px solid #1e1e2e",
+      }}>
+        {sorted.map((region) => {
+          const heightA = maxVal > 0 ? (region.activationA / maxVal) * 100 : 0
+          const heightB = maxVal > 0 ? (region.activationB / maxVal) * 100 : 0
 
-            {/* Stacked bars */}
-            <div className="flex flex-col gap-1">
-              <div
-                className="relative"
-                style={{ height: "8px", background: "#1e1e2e", borderRadius: "4px" }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    height: "100%",
-                    width: `${Math.round(region.activationA * 100)}%`,
-                    background: "#00e5a0",
-                    borderRadius: "4px",
-                    transition: "width 400ms ease-out",
-                  }}
-                />
-              </div>
-              <div
-                className="relative"
-                style={{ height: "8px", background: "#1e1e2e", borderRadius: "4px" }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    height: "100%",
-                    width: `${Math.round(region.activationB * 100)}%`,
-                    background: "#00b4d8",
-                    borderRadius: "4px",
-                    transition: "width 400ms ease-out",
-                  }}
-                />
-              </div>
+          return (
+            <div
+              key={region.name}
+              style={{
+                flex: 1,
+                display: "flex",
+                gap: "3px",
+                alignItems: "flex-end",
+                justifyContent: "center",
+                height: "100%",
+              }}
+            >
+              {/* Bar A */}
+              <div style={{
+                width: "16px",
+                height: `${heightA}%`,
+                background: "linear-gradient(180deg, #00e5a0, #00e5a066)",
+                borderRadius: "3px 3px 0 0",
+                transition: "height 600ms ease-out",
+                minHeight: "4px",
+              }} />
+              {/* Bar B */}
+              <div style={{
+                width: "16px",
+                height: `${heightB}%`,
+                background: "linear-gradient(180deg, #00b4d8, #00b4d866)",
+                borderRadius: "3px 3px 0 0",
+                transition: "height 600ms ease-out",
+                minHeight: "4px",
+              }} />
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Labels */}
+      <div style={{
+        display: "flex",
+        gap: "8px",
+        marginTop: "8px",
+      }}>
+        {sorted.map((region) => (
+          <div
+            key={region.name}
+            style={{
+              flex: 1,
+              textAlign: "center",
+            }}
+          >
+            <div style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "10px",
+              color: "#e8e6e3",
+              lineHeight: 1.3,
+              marginBottom: "2px",
+            }}>
+              {region.displayName}
+            </div>
+            <div style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "10px",
+              color: region.delta > 0 ? "#00b4d8" : "#00e5a0",
+            }}>
+              {region.delta > 0 ? "+" : ""}{(region.delta * 100).toFixed(0)}%
             </div>
           </div>
         ))}
       </div>
 
       {/* Legend */}
-      <div className="flex gap-4 mt-4" style={{ fontSize: "11px", color: "#8a8a9a" }}>
-        <div className="flex items-center gap-1">
-          <div style={{ width: 8, height: 8, borderRadius: 2, background: "#00e5a0" }} />
-          <span style={{ fontFamily: "var(--font-mono)" }}>IMAGE A</span>
+      <div style={{
+        display: "flex",
+        gap: "16px",
+        marginTop: "16px",
+        justifyContent: "center",
+      }}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          fontFamily: "var(--font-mono)",
+          fontSize: "11px",
+          color: "#8a8a9a",
+        }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: "#00e5a0" }} />
+          IMAGE A
         </div>
-        <div className="flex items-center gap-1">
-          <div style={{ width: 8, height: 8, borderRadius: 2, background: "#00b4d8" }} />
-          <span style={{ fontFamily: "var(--font-mono)" }}>IMAGE B</span>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          fontFamily: "var(--font-mono)",
+          fontSize: "11px",
+          color: "#8a8a9a",
+        }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: "#00b4d8" }} />
+          IMAGE B
         </div>
       </div>
     </div>
