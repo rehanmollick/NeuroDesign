@@ -127,7 +127,7 @@ export default function Home() {
       console.error("Compare error:", err)
       if (err instanceof DOMException && err.name === "AbortError") {
         setError(
-          "Taking longer than expected. Try a preset comparison while you wait."
+          "Request timed out (>110s). The GPU server may be cold — wait 30 seconds and try again, or explore a preset comparison."
         )
       } else {
         setError(

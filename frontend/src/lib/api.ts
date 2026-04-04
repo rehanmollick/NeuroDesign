@@ -1,6 +1,6 @@
 import { ComparisonResult, PresetComparison } from "./types"
 
-const API_TIMEOUT = 45000 // 45s
+const API_TIMEOUT = 110000 // 110s — Modal T4 cold start + inference can take 90s
 
 export const PRESETS: PresetComparison[] = [
   { id: "apple-vs-cluttered", label: "Apple vs Cluttered", file: "apple-vs-cluttered.json" },
