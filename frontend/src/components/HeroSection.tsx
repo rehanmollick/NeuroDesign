@@ -50,10 +50,11 @@ export default function HeroSection({ meshData }: HeroSectionProps) {
 
         {/* Title overlay */}
         <div
+          className="hero-title"
           style={{
             position: "absolute",
-            bottom: "20%",
-            left: "48px",
+            bottom: "25%",
+            left: "clamp(20px, 5vw, 48px)",
             zIndex: 10,
             pointerEvents: "none",
           }}
