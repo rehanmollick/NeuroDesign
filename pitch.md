@@ -1,68 +1,59 @@
-# NeuroDesign - 2 Minute Demo Script
+# NeuroDesign - 2 Min Demo
 
-## Opening (15 seconds)
+## OPEN (15s)
 
-"Have you ever heard of neuromarketing firms? Companies like Neurons Inc put people in fMRI machines and charge $50,000 to tell Nike which ad makes the brain light up more. Only the biggest companies in the world can afford that.
+> Have you ever heard of neuromarketing? Companies pay $50,000 to put people in brain scanners and find out which ad works better. Only Nike and Apple can afford that.
+>
+> We made it free. Upload two designs, see how the brain responds. That's NeuroDesign.
 
-We built NeuroDesign. It does the same thing, for free, in your browser."
+## SHOW THE BRAIN (10s)
 
-## The Hook - Show the App (15 seconds)
+*Site is already open. Hero brain pulsing.*
 
-*Open the site. The hero brain is already pulsing with synapse animations.*
+> This is 20,000 points on the human cortex. Real mesh, real data.
 
-"This is a real brain mesh, 20,000 points on the human cortex. And these pulses? That is about to become real data."
+## DEMO PRESETS (30s)
 
-## Preset Demo (30 seconds)
+*Apple vs Cluttered is loaded.*
 
-*Click through the Apple vs Cluttered preset. Brains are already loaded.*
+> Apple versus a cluttered competitor. Left brain: focused activation. Reward centers, attention, face processing. Right brain: lighting up everywhere. That's not good. That's the brain struggling. Cognitive overload.
 
-"Let me show you. Here is Apple's homepage versus a cluttered competitor. The brain on the left... see how the activation is focused? Fusiform face area, reward centers, focused attention. Clean. Efficient. The brain on the right is lighting up everywhere, but that is not good. That is cognitive overload. The brain is struggling to process the visual noise."
+*Scroll to verdict.*
 
-*Scroll to the verdict section.*
+> It picks a winner. Breaks down emotional impact, attention, memory.
 
-"NeuroDesign picks a winner and tells you why. Emotional impact, visual attention, memory retention, all broken down."
+*Click Face vs No Face tab.*
 
-*Click another preset tab (Face vs No Face).*
+> Face versus no face. See that spike? Fusiform face area. That's why every good landing page has a person on it.
 
-"Switch comparisons instantly. Face versus no face. Look at that, the fusiform face area just explodes when there is a human face. That is why every good landing page has a person on it."
+## AI CHAT (15s)
 
-## AI Chat (20 seconds)
+*Open chat.*
 
-*Open the chat sidebar.*
+> Ask it anything. "Which is better?" It gives you a straight answer with brain data to back it up. No hedging.
 
-"And if you want to dig deeper, we have an AI advisor powered by Gemma 4. Ask it anything. 'Which design is better for conversion?' It does not hedge. It picks a winner, tells you why, gives you specific recommendations backed by the brain data."
+## UPLOAD YOUR OWN (15s)
 
-## Custom Upload (20 seconds)
+*Drag in two images.*
 
-*Upload two of your own images.*
+> Upload your own designs. We run Meta's TRIBE v2 on a GPU. Same model Meta's research team built. Real fMRI prediction, not a heuristic.
 
-"But the real power is this. Upload your own designs. Your landing page, your competitor's landing page. We send them to a T4 GPU running Meta's TRIBE v2, the same model Meta uses for brain research. It predicts what an fMRI scan would show for each image."
+## CLOSE (15s)
 
-*Show the staged loading: "Predicting brain activity...", "Scanning Image A..."*
-
-"It takes about two minutes because we are running real neuroscience inference, not a heuristic. This is actual predicted brain data."
-
-## The Big Picture (20 seconds)
-
-"Right now, design A/B testing is based on clicks and conversions. You find out what works after you ship. NeuroDesign tells you what will work before you ship, because it tests the design against the human brain itself.
-
-Neuromarketing used to cost $50,000 and take weeks. We just made it free and instant. That is NeuroDesign."
+> Design testing today: ship it, wait for clicks, hope for the best. NeuroDesign: test it against the brain before you ship.
+>
+> $50,000 and weeks... or free and instant. That's NeuroDesign.
 
 ---
 
-## Key Points to Hit if Judges Ask Questions
+## JUDGE Q&A (cheat sheet)
 
-**"How accurate is this?"**
-TRIBE v2 is Meta's state-of-the-art model, trained on real fMRI data. It predicts brain activation patterns that correlate with actual fMRI scans. It is not a heuristic or a guess. It is a neural network trained on real neuroscience data.
+**Accurate?** TRIBE v2 is Meta's model trained on real fMRI scans. Not a heuristic.
 
-**"Why does it take 2 minutes?"**
-We are running the full TRIBE v2 model on a GPU. Each image gets converted to video (TRIBE v2 expects video input), then processed through a deep neural network that predicts activation at 20,000 cortical points. Real inference, not an API wrapper.
+**Why 2 min wait?** Full GPU inference on 20,000 cortical points per image. Real science, not an API wrapper.
 
-**"What's the business model?"**
-Freemium. Free for individual designers. Paid tiers for agencies and teams who want historical tracking, Figma integration, and faster inference on dedicated GPUs.
+**Business model?** Free for designers. Paid for agencies (faster GPUs, Figma plugin, history tracking).
 
-**"What's next?"**
-Figma plugin so designers never leave their tool. Faster GPUs to get inference under 30 seconds. Historical database so you can see how your design iterations improve brain response over time.
+**What's next?** Figma plugin. Faster GPUs. Save comparisons over time.
 
-**"How is this different from eye-tracking tools?"**
-Eye tracking tells you where people look. We tell you what their brain does when they look. Emotional response, memory encoding, reward activation. That is a deeper layer of insight.
+**vs eye-tracking?** Eye tracking = where people look. We show what the brain does when they look. Emotion, memory, reward. Deeper.
