@@ -60,7 +60,7 @@ export default function ChatAdvisor({ comparison, isOpen, onClose }: ChatAdvisor
       const firstQ = "Summarize which design is better and why, in 2-3 sentences."
       setMessages([{ role: "user", content: firstQ }])
       setLoading(true)
-      chatWithAdvisor(firstQ, comparison.regions, comparison.summary, [])
+      chatWithAdvisor(firstQ, comparison.regions, comparison.summary, [], comparison.detailed)
         .then((response) => {
           setMessages((prev) => [...prev, { role: "assistant", content: response }])
         })
@@ -104,7 +104,8 @@ export default function ChatAdvisor({ comparison, isOpen, onClose }: ChatAdvisor
         userMessage,
         comparison.regions,
         comparison.summary,
-        messages
+        messages,
+        comparison.detailed
       )
       setMessages((prev) => [...prev, { role: "assistant", content: response }])
     } catch {

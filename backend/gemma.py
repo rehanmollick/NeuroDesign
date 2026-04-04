@@ -125,37 +125,42 @@ Use plain language. Be specific about what each image does to the brain. No jarg
     return {}
 
 
-def chat(regions: list[dict], summary: str, user_message: str, history: list[dict] = None) -> str:
+def chat(regions: list[dict], summary: str, user_message: str, history: list[dict] = None, detailed: dict = None) -> str:
     """Chat about the comparison. Returns Gemma's response."""
     region_text = _build_region_text(regions)
 
+    # Build verdict context from the detailed analysis
+    verdict = ""
+    if detailed:
+        winner = detailed.get("winner", "")
+        winner_name = f"Image {winner}" if winner in ("A", "B") else "Neither"
+        verdict = f"""
+VERDICT (this is already decided, do not contradict it):
+- Winner: {winner_name}
+- Why: {detailed.get('winner_reason', '')}
+- Emotional impact: {detailed.get('emotional_impact', '')}
+- Visual attention: {detailed.get('visual_attention', '')}
+- Memory retention: {detailed.get('memory_retention', '')}"""
+
     context = f"""You are a confident neuromarketing advisor. A designer is comparing two images using brain activation prediction.
 
-Here is the comparison data:
+Brain region data:
 {region_text}
 
-Previous analysis: {summary}
+Summary: {summary}
+{verdict}
 
-CRITICAL INTERPRETATION RULES:
-- More total brain activation does NOT mean better. Cluttered, ugly, or visually noisy images activate many brain regions because the brain is working overtime to process the mess. That is cognitive overload, which is BAD.
-- A clean, professional, well-designed image activates fewer regions but the RIGHT ones: face processing, reward centers, and focused attention areas. That is GOOD design.
-- High activation in low-level visual areas (V1, V2, early visual cortex) from a busy image = the brain struggling to parse clutter. Not a win.
-- High activation in higher-order areas (fusiform, prefrontal, reward areas) from a clean image = real engagement and meaning processing. That IS a win.
-- When one image is clearly cleaner/more professional than the other, it almost always wins from a neuromarketing perspective. Do NOT say the cluttered one is better just because it has more raw activation.
-- Judge by QUALITY of activation (which specific regions light up), not QUANTITY (total activation amount).
-
-RESPONSE RULES:
-- ALWAYS pick a winner. Never say "neither is objectively better" or "both have merits."
-- Your answer MUST be consistent with the analysis summary above. If the summary says Image A wins, you say Image A wins.
-- If asked which is better, state the winner clearly in the first sentence, then explain why in 1-2 more sentences.
-- Be specific about what the winning design does better (e.g. "Image A captures attention 34% more effectively because it activates the fusiform face area").
-- Give actionable, concrete advice. Not "consider improving" but "add a human face to increase emotional engagement by ~20%."
+RULES:
+- The verdict above is the ground truth. NEVER contradict it. If it says Image A wins, you say Image A wins.
+- If asked which is better, state the winner from the verdict in the first sentence, then explain why.
+- Be specific (e.g. "Image A captures attention 34% more because it activates the fusiform face area").
+- Give actionable advice. Not "consider improving" but "add a human face to increase emotional engagement by ~20%."
 - Keep responses to 2-4 sentences unless they ask for more detail.
-- Sound confident, not wishy-washy. You are an expert delivering a verdict, not a diplomat hedging."""
+- Sound confident. You are an expert delivering a verdict."""
 
     messages = [{"text": context}]
     if history:
-        for msg in history[-6:]:  # keep last 6 messages for context
+        for msg in history[-6:]:
             messages.append({"text": msg["content"]})
     messages.append({"text": f"Designer asks: {user_message}"})
 

@@ -45,7 +45,8 @@ export async function chatWithAdvisor(
   message: string,
   regions: ComparisonResult["regions"],
   summary: string,
-  history: ChatMessage[]
+  history: ChatMessage[],
+  detailed?: ComparisonResult["detailed"]
 ): Promise<string> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 90000)
@@ -56,7 +57,7 @@ export async function chatWithAdvisor(
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, regions, summary, history }),
+        body: JSON.stringify({ message, regions, summary, history, detailed }),
         signal: controller.signal,
       }
     )

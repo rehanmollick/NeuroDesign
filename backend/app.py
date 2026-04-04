@@ -132,11 +132,12 @@ def fastapi_app():
         summary = body.get("summary", "")
         message = body.get("message", "")
         history = body.get("history", [])
+        detailed = body.get("detailed", {})
 
         if not message:
             raise HTTPException(status_code=400, detail="Message required")
 
-        response = gemma_chat(regions, summary, message, history)
+        response = gemma_chat(regions, summary, message, history, detailed)
         if not response:
             raise HTTPException(status_code=503, detail="Chat unavailable")
 
