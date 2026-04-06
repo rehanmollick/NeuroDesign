@@ -1,46 +1,16 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import dynamic from "next/dynamic"
+import { useState, useEffect, useCallback } from "react"
 import { MeshData, ComparisonResult, PageState } from "@/lib/types"
 import { loadPreset, compareImages, PRESETS } from "@/lib/api"
 import HeroSection from "@/components/HeroSection"
 import PresetTabs from "@/components/PresetTabs"
-import UploadZone from "@/components/UploadZone"
+import ImageColumn from "@/components/ImageColumn"
 import CompareButton from "@/components/CompareButton"
-import TopDifferences from "@/components/TopDifferences"
-import VerdictSection from "@/components/VerdictSection"
-import AnalysisCards from "@/components/AnalysisCards"
+import AnalysisSection from "@/components/AnalysisSection"
 import ChatAdvisor from "@/components/ChatAdvisor"
+import ChatFab from "@/components/ChatFab"
 import RegionDetail from "@/components/RegionDetail"
-
-const BrainViewer = dynamic(() => import("@/components/BrainViewer"), {
-  ssr: false,
-  loading: () => (
-    <div
-      className="flex items-center justify-center"
-      style={{ aspectRatio: "1", color: "#8a8a9a", fontSize: "14px" }}
-    >
-      Loading...
-    </div>
-  ),
-})
-
-function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-40px" })
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-      transition={{ duration: 0.5, ease: "easeOut", delay }}
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 export default function Home() {
   const [meshData, setMeshData] = useState<MeshData | null>(null)
@@ -157,10 +127,9 @@ export default function Home() {
     <main>
       <a href="#tool" className="skip-link">Skip to comparison tool</a>
 
-      {/* === HERO === */}
       <HeroSection meshData={meshData} />
 
-      {/* === MAIN TOOL === one screen, no scroll needed */}
+      {/* === MAIN TOOL === */}
       <section
         id="tool"
         style={{
@@ -170,331 +139,39 @@ export default function Home() {
         }}
       >
         <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-          {/* Preset tabs */}
           <PresetTabs activePreset={activePreset} onSelect={handlePresetSelect} />
 
-          {/* Neon divider */}
           <div className="neon-line" style={{ marginTop: "20px", marginBottom: "20px" }} />
 
-          {/* Upload + Images + Brains: all on one screen */}
           <div className="tool-grid" style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "20px",
           }}>
-            {/* Column A */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* Image display or upload */}
-              {fileA && previewA ? (
-                // User uploaded: show full-size preview with swap option
-                <div style={{ position: "relative" }}>
-                  <div style={{
-                    position: "relative",
-                    borderRadius: "4px",
-                    overflow: "hidden",
-                    border: "1px solid #00e5a033",
-                  }}>
-                    <img
-                      src={previewA}
-                      alt="Your Image A"
-                      style={{
-                        width: "100%",
-                        aspectRatio: "16/10",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                    <div style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: "8px 12px",
-                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}>
-                      <span style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "11px",
-                        color: "#00e5a0",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                      }}>
-                        Your Image A
-                      </span>
-                      <button
-                        onClick={() => handleFileA(null)}
-                        style={{
-                          background: "rgba(255,107,107,0.2)",
-                          border: "1px solid rgba(255,107,107,0.3)",
-                          borderRadius: "3px",
-                          color: "#ff6b6b",
-                          fontSize: "11px",
-                          padding: "2px 8px",
-                          cursor: "pointer",
-                          fontFamily: "var(--font-mono)",
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : comparison?.imageA.url ? (
-                // Preset active: show preset image + upload overlay
-                <div style={{ position: "relative" }}>
-                  <div style={{
-                    position: "relative",
-                    borderRadius: "4px",
-                    overflow: "hidden",
-                    border: "1px solid #1e1e2e",
-                  }}>
-                    <img
-                      src={comparison.imageA.url}
-                      alt={comparison.imageA.name}
-                      style={{
-                        width: "100%",
-                        aspectRatio: "16/10",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                    <div style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: "8px 12px",
-                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
-                    }}>
-                      <span style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "11px",
-                        color: "#e8e6e3",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                      }}>
-                        {comparison.imageA.name}
-                      </span>
-                    </div>
-                  </div>
-                  {/* Upload overlay */}
-                  <div
-                    style={{
-                      marginTop: "6px",
-                      opacity: 0.6,
-                      transition: "opacity 200ms ease-out",
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }}
-                    onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6" }}
-                  >
-                    <UploadZone label="image A" file={null} onFileSelect={handleFileA} compact />
-                  </div>
-                </div>
-              ) : (
-                // No preset, no upload: show full upload zone
-                <div>
-                  <div style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "11px",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#8a8a9a",
-                    marginBottom: "6px",
-                  }}>
-                    Image A
-                  </div>
-                  <UploadZone label="image A" file={fileA} onFileSelect={handleFileA} />
-                </div>
-              )}
-
-              {/* Brain A */}
-              <div style={{
-                maxWidth: "320px",
-                margin: "0 auto",
-                width: "100%",
-                position: "relative",
-              }}>
-                {scanning && (
-                  <div style={{
-                    position: "absolute", inset: 0, zIndex: 5, pointerEvents: "none",
-                    overflow: "hidden", borderRadius: "4px",
-                  }}>
-                    <div style={{
-                      position: "absolute", width: "30%", height: "100%",
-                      background: "linear-gradient(90deg, transparent, rgba(0,229,160,0.1), transparent)",
-                      animation: "scanSweep 1.5s ease-in-out infinite",
-                    }} />
-                  </div>
-                )}
-                <BrainViewer
-                  meshData={meshData}
-                  activations={comparison?.activations.imageA ?? null}
-                  label=""
-                  isLoading={isScanning}
-                  onRegionClick={(r) => setSelectedRegion(r)}
-                  resetKey={comparison?.imageA.name}
-                />
-              </div>
-            </div>
-
-            {/* Column B */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {fileB && previewB ? (
-                <div style={{ position: "relative" }}>
-                  <div style={{
-                    position: "relative",
-                    borderRadius: "4px",
-                    overflow: "hidden",
-                    border: "1px solid #00b4d833",
-                  }}>
-                    <img
-                      src={previewB}
-                      alt="Your Image B"
-                      style={{
-                        width: "100%",
-                        aspectRatio: "16/10",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                    <div style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: "8px 12px",
-                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}>
-                      <span style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "11px",
-                        color: "#00b4d8",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                      }}>
-                        Your Image B
-                      </span>
-                      <button
-                        onClick={() => handleFileB(null)}
-                        style={{
-                          background: "rgba(255,107,107,0.2)",
-                          border: "1px solid rgba(255,107,107,0.3)",
-                          borderRadius: "3px",
-                          color: "#ff6b6b",
-                          fontSize: "11px",
-                          padding: "2px 8px",
-                          cursor: "pointer",
-                          fontFamily: "var(--font-mono)",
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : comparison?.imageB.url ? (
-                <div style={{ position: "relative" }}>
-                  <div style={{
-                    position: "relative",
-                    borderRadius: "4px",
-                    overflow: "hidden",
-                    border: "1px solid #1e1e2e",
-                  }}>
-                    <img
-                      src={comparison.imageB.url}
-                      alt={comparison.imageB.name}
-                      style={{
-                        width: "100%",
-                        aspectRatio: "16/10",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                    <div style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: "8px 12px",
-                      background: "linear-gradient(transparent, rgba(10,10,15,0.9))",
-                    }}>
-                      <span style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "11px",
-                        color: "#e8e6e3",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                      }}>
-                        {comparison.imageB.name}
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      marginTop: "6px",
-                      opacity: 0.6,
-                      transition: "opacity 200ms ease-out",
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }}
-                    onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6" }}
-                  >
-                    <UploadZone label="image B" file={null} onFileSelect={handleFileB} compact />
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <div style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "11px",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#8a8a9a",
-                    marginBottom: "6px",
-                  }}>
-                    Image B
-                  </div>
-                  <UploadZone label="image B" file={fileB} onFileSelect={handleFileB} />
-                </div>
-              )}
-
-              {/* Brain B */}
-              <div style={{
-                maxWidth: "320px",
-                margin: "0 auto",
-                width: "100%",
-                position: "relative",
-              }}>
-                {scanning && (
-                  <div style={{
-                    position: "absolute", inset: 0, zIndex: 5, pointerEvents: "none",
-                    overflow: "hidden", borderRadius: "4px",
-                  }}>
-                    <div style={{
-                      position: "absolute", width: "30%", height: "100%",
-                      background: "linear-gradient(90deg, transparent, rgba(0,229,160,0.1), transparent)",
-                      animation: "scanSweep 1.5s ease-in-out infinite",
-                    }} />
-                  </div>
-                )}
-                <BrainViewer
-                  meshData={meshData}
-                  activations={comparison?.activations.imageB ?? null}
-                  label=""
-                  isLoading={isScanning}
-                  onRegionClick={(r) => setSelectedRegion(r)}
-                  resetKey={comparison?.imageB.name}
-                />
-              </div>
-            </div>
+            <ImageColumn
+              side="A"
+              file={fileA}
+              preview={previewA}
+              comparison={comparison}
+              meshData={meshData}
+              scanning={scanning}
+              isScanning={isScanning}
+              onFileSelect={handleFileA}
+              onRegionClick={setSelectedRegion}
+            />
+            <ImageColumn
+              side="B"
+              file={fileB}
+              preview={previewB}
+              comparison={comparison}
+              meshData={meshData}
+              scanning={scanning}
+              isScanning={isScanning}
+              onFileSelect={handleFileB}
+              onRegionClick={setSelectedRegion}
+            />
           </div>
 
-          {/* Compare button for custom uploads */}
           {(fileA || fileB) && (
             <div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
               <CompareButton
@@ -522,7 +199,6 @@ export default function Home() {
             <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "#8a8a9a" }}>HIGH</span>
           </div>
 
-          {/* Error */}
           {error && (
             <div style={{
               marginTop: "16px",
@@ -540,66 +216,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* === ANALYSIS SECTION === cinematic story flow */}
-      {comparison && (
-        <section style={{
-          background: "#0a0a0f",
-          padding: "0 clamp(20px, 5vw, 48px)",
-          position: "relative",
-        }}>
-          <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+      {comparison && <AnalysisSection comparison={comparison} />}
 
-            {/* Section connector */}
-            <div className="section-connector" />
-
-            {/* VERDICT — the centerpiece */}
-            <FadeIn>
-              <VerdictSection comparison={comparison} />
-            </FadeIn>
-
-            {/* Section connector */}
-            <div className="section-connector" />
-
-            {/* INSIGHTS + RECOMMENDATIONS */}
-            <FadeIn delay={0.1}>
-              <div style={{ padding: "40px 0" }}>
-                <div style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "12px",
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  color: "#8a8a9a",
-                  marginBottom: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}>
-                  <span style={{
-                    width: "24px",
-                    height: "1px",
-                    background: "#8a8a9a",
-                  }} />
-                  Detailed Analysis
-                </div>
-                <AnalysisCards comparison={comparison} />
-              </div>
-            </FadeIn>
-
-            {/* Section connector */}
-            <div className="section-connector" />
-
-            {/* BRAIN REGION CHART — full width */}
-            <FadeIn delay={0.15}>
-              <div style={{ padding: "40px 0" }}>
-                <TopDifferences regions={comparison.regions} />
-              </div>
-            </FadeIn>
-
-          </div>
-        </section>
-      )}
-
-      {/* === FOOTER === */}
       <footer style={{
         borderTop: "1px solid #1e1e2e",
         padding: "32px 48px",
@@ -619,38 +237,8 @@ export default function Home() {
         </p>
       </footer>
 
-      {/* Chat FAB button */}
-      {comparison && !chatOpen && (
-        <button
-          onClick={() => setChatOpen(true)}
-          style={{
-            position: "fixed",
-            bottom: "28px",
-            right: "28px",
-            width: "56px",
-            height: "56px",
-            borderRadius: "50%",
-            background: "#00e5a0",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 80,
-            animation: "fabPulse 2s ease-in-out infinite",
-            transition: "transform 200ms ease-out",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.1)" }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)" }}
-          aria-label="Open Design Advisor chat"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" strokeWidth="2" strokeLinecap="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-        </button>
-      )}
+      {comparison && !chatOpen && <ChatFab onClick={() => setChatOpen(true)} />}
 
-      {/* Chat sidebar */}
       <ChatAdvisor
         comparison={comparison}
         isOpen={chatOpen}
