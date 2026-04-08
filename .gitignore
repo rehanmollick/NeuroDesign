@@ -3,7 +3,6 @@ backend/__pycache__/
 .gstack/
 *.md
 !README.md
-!README-V1.md
 !pitch.md
 !fillThese.md
 !judging.md
