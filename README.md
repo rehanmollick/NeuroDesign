@@ -2,7 +2,7 @@
 
 > Neuroscience-backed A/B testing for designers. Upload two images, see how the human brain actually responds to each one, and get AI-powered recommendations rooted in real fMRI research.
 
-**[Live Demo →](https://frontend-gamma-ten-23.vercel.app)**
+**[Live Demo →]([https://frontend-gamma-ten-23.vercel.app](https://neurodesign-v2.vercel.app/))**
 
 This is the **original hackathon build** of NeuroDesign. It won the hackathon and this repo is a snapshot of what shipped that weekend. The project has since been rewritten as **V2** with a different model stack, composite neural signals, a RAG knowledge base, and a cleaner architecture.
 
