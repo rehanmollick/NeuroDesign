@@ -1,4 +1,4 @@
-# NeuroDesign (V1, Hackathon Build) - Won 'Most Creative' Track at Claude Builder Club Hackathon at UT Austin.
+# NeuroDesign (V1) - Won 'Most Creative' Track at Claude Builder Club Hackathon at UT Austin.
 
 > Neuroscience-backed A/B testing for designers. Upload two images, see how the human brain actually responds to each one, and get AI-powered recommendations rooted in real fMRI research.
 
